@@ -4,6 +4,7 @@ A modern React TypeScript application with Tailwind CSS, DaisyUI, Axios for API 
 
 ## 🚀 Tech Stack
 
+### Frontend
 - **React 19** - UI library
 - **TypeScript** - Type safety
 - **Vite** - Build tool and dev server
@@ -14,14 +15,29 @@ A modern React TypeScript application with Tailwind CSS, DaisyUI, Axios for API 
 - **ESLint** - Code linting
 - **Prettier** - Code formatting
 
+### Backend
+- **PHP 8.1+** - Server-side language
+- **Slim Framework 4** - Micro-framework for PHP
+- **SQLite** - Embedded database
+- **Composer** - PHP dependency manager
+
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
+
+### Frontend
 - Node.js (v18 or higher)
 - npm or yarn
 - A Supabase account (for authentication features)
 
+### Backend
+- PHP 8.1 or higher
+- Composer
+- SQLite3
+
 ## 🛠️ Setup Instructions
+
+### Frontend Setup
 
 ### 1. Clone the repository
 
@@ -49,7 +65,7 @@ Edit `.env` and add your Supabase credentials:
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_API_BASE_URL=http://localhost:3000/api
+VITE_API_BASE_URL=http://localhost:8000/api
 ```
 
 To get your Supabase credentials:
@@ -66,38 +82,85 @@ npm run dev
 
 The app will be available at `http://localhost:3000`
 
+### Backend Setup
+
+### 1. Install PHP dependencies
+
+```bash
+cd backend
+composer install
+```
+
+### 2. Initialize the database
+
+The database will be automatically created on first run. You can also manually initialize it:
+
+```bash
+php init-db.php
+```
+
+### 3. Start the backend server
+
+```bash
+cd backend/public
+php -S localhost:8000
+```
+
+The API will be available at `http://localhost:8000`
+
+### 4. Test the API
+
+```bash
+curl http://localhost:8000/
+```
+
+For more details, see the [Backend README](backend/README.md).
+
 ## 📁 Project Structure
 
 ```
 transactions-app/
+├── backend/                # PHP backend API
+│   ├── public/             # Web root
+│   │   └── index.php       # API entry point
+│   ├── src/                # Source code
+│   │   ├── Controllers/    # API controllers
+│   │   ├── Models/         # Data models
+│   │   ├── Middleware/     # HTTP middleware
+│   │   └── Database/       # Database utilities
+│   ├── config/             # Configuration
+│   ├── docs/               # Backend documentation
+│   ├── backups/            # Database backups
+│   ├── composer.json       # PHP dependencies
+│   └── README.md           # Backend documentation
 ├── src/
-│   ├── components/      # React components
+│   ├── components/         # React components
 │   │   ├── Header.tsx
 │   │   └── LoginForm.tsx
-│   ├── hooks/           # Custom React hooks
+│   ├── hooks/              # Custom React hooks
 │   │   └── useAuth.ts
-│   ├── lib/             # Library configurations
-│   │   ├── axios.ts     # Axios instance configuration
-│   │   └── supabase.ts  # Supabase client configuration
-│   ├── pages/           # Page components
-│   ├── styles/          # CSS files
+│   ├── lib/                # Library configurations
+│   │   ├── axios.ts        # Axios instance configuration
+│   │   └── supabase.ts     # Supabase client configuration
+│   ├── pages/              # Page components
+│   ├── styles/             # CSS files
 │   │   └── index.css
-│   ├── types/           # TypeScript type definitions
+│   ├── types/              # TypeScript type definitions
 │   │   └── auth.types.ts
-│   ├── utils/           # Utility functions
-│   ├── App.tsx          # Main App component
-│   ├── main.tsx         # Application entry point
-│   └── vite-env.d.ts    # Vite environment types
-├── public/              # Static assets
-├── .env.example         # Example environment variables
-├── .eslintrc.cjs        # ESLint configuration
-├── .prettierrc.json     # Prettier configuration
-├── index.html           # HTML entry point
-├── package.json         # Dependencies and scripts
-├── postcss.config.js    # PostCSS configuration
-├── tailwind.config.js   # Tailwind CSS configuration
-├── tsconfig.json        # TypeScript configuration
-└── vite.config.ts       # Vite configuration
+│   ├── utils/              # Utility functions
+│   ├── App.tsx             # Main App component
+│   ├── main.tsx            # Application entry point
+│   └── vite-env.d.ts       # Vite environment types
+├── public/                 # Static assets
+├── .env.example            # Example environment variables
+├── .eslintrc.cjs           # ESLint configuration
+├── .prettierrc.json        # Prettier configuration
+├── index.html              # HTML entry point
+├── package.json            # Dependencies and scripts
+├── postcss.config.js       # PostCSS configuration
+├── tailwind.config.js      # Tailwind CSS configuration
+├── tsconfig.json           # TypeScript configuration
+└── vite.config.ts          # Vite configuration
 ```
 
 ## 🎨 Styling
@@ -156,22 +219,52 @@ function MyComponent() {
 
 ## 🌐 API Calls
 
-Axios is configured with interceptors for authentication and error handling.
+The backend provides a RESTful API for managing transactions. Axios is configured with interceptors for authentication and error handling.
+
+### Backend API Endpoints
+
+```
+GET    /api/transactions              # List all transactions
+GET    /api/transactions/{id}         # Get single transaction
+POST   /api/transactions              # Create transaction
+PUT    /api/transactions/{id}         # Update transaction
+DELETE /api/transactions/{id}         # Delete transaction
+GET    /api/transactions/summary/stats # Get transaction summary
+GET    /api/categories                # List categories
+POST   /api/backup                    # Create database backup
+GET    /api/backups                   # List backups
+```
 
 ### Example Usage
 
 ```tsx
 import { apiClient } from './lib/axios';
 
-// GET request
-const fetchData = async () => {
-  const response = await apiClient.get('/endpoint');
+// GET request - List transactions
+const fetchTransactions = async (userId: string) => {
+  const response = await apiClient.get('/transactions', {
+    params: { user_id: userId }
+  });
   return response.data;
 };
 
-// POST request
-const postData = async (data: any) => {
-  const response = await apiClient.post('/endpoint', data);
+// POST request - Create transaction
+const createTransaction = async (data: TransactionData) => {
+  const response = await apiClient.post('/transactions', data);
+  return response.data;
+};
+
+// PUT request - Update transaction
+const updateTransaction = async (id: number, data: TransactionData) => {
+  const response = await apiClient.put(`/transactions/${id}`, data);
+  return response.data;
+};
+
+// DELETE request
+const deleteTransaction = async (id: number, userId: string) => {
+  const response = await apiClient.delete(`/transactions/${id}`, {
+    params: { user_id: userId }
+  });
   return response.data;
 };
 ```
@@ -181,8 +274,11 @@ The Axios instance automatically:
 - Handles 401 (Unauthorized) responses
 - Sets default headers and timeout
 
+For complete API documentation, see [Backend README](backend/README.md).
+
 ## 📜 Available Scripts
 
+### Frontend Scripts
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
@@ -190,6 +286,12 @@ The Axios instance automatically:
 - `npm run lint:fix` - Fix linting errors automatically
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
+
+### Backend Scripts
+- `cd backend && composer install` - Install dependencies
+- `php init-db.php` - Initialize database
+- `php -S localhost:8000` - Start development server (from backend/public)
+- `composer test` - Run PHPUnit tests
 
 ## 🎯 Coding Conventions
 
@@ -262,6 +364,7 @@ The Axios instance automatically:
 
 ## 📚 Additional Resources
 
+### Frontend
 - [React Documentation](https://react.dev/)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Vite Documentation](https://vitejs.dev/)
@@ -269,6 +372,19 @@ The Axios instance automatically:
 - [DaisyUI Documentation](https://daisyui.com/)
 - [Supabase Documentation](https://supabase.com/docs)
 - [Axios Documentation](https://axios-http.com/docs/intro)
+
+### Backend
+- [PHP Manual](https://www.php.net/manual/)
+- [Slim Framework Documentation](https://www.slimframework.com/docs/)
+- [SQLite Documentation](https://www.sqlite.org/docs.html)
+- [PHP Best Practices](backend/docs/PHP_SQLITE_BEST_PRACTICES.md)
+
+## 📖 Documentation
+
+- [Frontend Coding Conventions](CODING_CONVENTIONS.md)
+- [Backend README](backend/README.md)
+- [PHP & SQLite Best Practices](backend/docs/PHP_SQLITE_BEST_PRACTICES.md)
+- [Quick Start Guide](QUICKSTART.md)
 
 ## 📄 License
 

@@ -1,0 +1,27 @@
+{
+    "name": "transactions-app/backend",
+    "description": "REST API backend for Transactions App using Slim Framework and SQLite",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "slim/slim": "^4.13",
+        "slim/psr7": "^1.6",
+        "php-di/php-di": "^7.0",
+        "monolog/monolog": "^3.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "TransactionsApp\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

@@ -1,6 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  /* Custom theme configuration can go here */
+}
 
 /* Custom global styles */
 body {

@@ -308,6 +308,10 @@ const buttonClass = `btn btn-soft-${variant}`;
 **Maintain a logical folder structure** to clearly distinguish between different parts of the application:
 
 ```
+docs/                   # All project documentation
+├── CODING_CONVENTIONS.md
+├── QUICKSTART.md
+└── [other-docs].md
 src/
 ├── components/
 │   ├── common/         # Reusable UI components (buttons, inputs, etc.)
@@ -320,7 +324,15 @@ src/
 ├── types/              # TypeScript type definitions
 ├── utils/              # Utility functions
 └── App.tsx             # Root component
+README.md               # Project overview (root level only)
 ```
+
+**Documentation Guidelines:**
+
+- **All documentation files must be placed in the `docs/` folder**
+- Only `README.md` should remain at the root level for GitHub/repository overview
+- Keep documentation organized and up-to-date
+- Use clear, descriptive filenames for documentation
 
 **Component Organization:**
 

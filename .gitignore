@@ -41,3 +41,4 @@ backend/database.sqlite
 backend/database.sqlite-journal
 backend/backups/*.zip
 backend/backups/*.sqlite
+!backend/backups/.gitkeep

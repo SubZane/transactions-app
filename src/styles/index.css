@@ -1,15 +1,20 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui";
 
-@theme {
-  /* Custom theme configuration can go here */
-}
+/* Import custom SCSS */
+@import './_mixins.scss';
+@import './_utilities.scss';
 
 /* Custom global styles */
 body {
-  @apply bg-base-100 text-base-content;
+  @apply bg-base-200 text-base-content;
 }
 
 #root {
   @apply min-h-screen;
+}
+
+/* Add subtle texture to the page background */
+.page-container {
+  @apply bg-base-100;
 }

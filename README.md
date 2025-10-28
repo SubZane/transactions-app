@@ -1,36 +1,51 @@
 # Transactions App
 
-A modern React TypeScript application with Tailwind CSS, DaisyUI, Axios for API calls, and Supabase for authentication.
+A modern financial tracking application designed for couples to log and manage their transactions together, promoting **financial equality and transparency**. Built with React, TypeScript, and DaisyUI.
+
+## 💡 Purpose
+
+This app helps couples (husband and wife) track their financial transactions in one shared space. Both partners can:
+
+- Log expenses and deposits
+- Categorize transactions
+- View shared financial data
+- Maintain balance and transparency in household finances
+- Promote financial equality through shared visibility
 
 ## 🚀 Tech Stack
 
 ### Frontend
+
 - **React 19** - UI library
 - **TypeScript** - Type safety
 - **Vite** - Build tool and dev server
-- **Tailwind CSS** - Utility-first CSS framework
-- **DaisyUI** - Tailwind CSS component library
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **DaisyUI 5** - Component library with Emerald theme
+- **Heroicons** - Icon library (solid variants)
 - **Axios** - HTTP client for API calls
-- **Supabase** - Authentication and backend services
-- **ESLint** - Code linting
+- **Supabase** - Authentication
+- **ESLint 9** - Code linting
 - **Prettier** - Code formatting
 
 ### Backend
+
+- **Apache** - Web server (localhost:80)
 - **PHP 8.1+** - Server-side language
-- **Slim Framework 4** - Micro-framework for PHP
-- **SQLite** - Embedded database
-- **Composer** - PHP dependency manager
+- **MySQL/MariaDB** - Database
+- **CORS handling** - Cross-origin request support
 
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
 
 ### Frontend
+
 - Node.js (v18 or higher)
 - npm or yarn
 - A Supabase account (for authentication features)
 
 ### Backend
+
 - PHP 8.1 or higher
 - Composer
 - SQLite3
@@ -69,6 +84,7 @@ VITE_API_BASE_URL=http://localhost:8000/api
 ```
 
 To get your Supabase credentials:
+
 1. Go to [Supabase Dashboard](https://app.supabase.com/)
 2. Select your project (or create a new one)
 3. Go to Settings > API
@@ -168,6 +184,7 @@ transactions-app/
 This project uses Tailwind CSS with DaisyUI for styling. DaisyUI provides pre-built components that follow Tailwind's utility-first approach.
 
 ### Available DaisyUI Themes
+
 - light
 - dark
 - cupcake
@@ -175,6 +192,7 @@ This project uses Tailwind CSS with DaisyUI for styling. DaisyUI provides pre-bu
 You can change the theme in `tailwind.config.js`.
 
 ### Using Tailwind CSS
+
 ```tsx
 <div className="btn btn-primary">Click me</div>
 <div className="card bg-base-200">
@@ -196,14 +214,14 @@ Authentication is handled by Supabase. The `useAuth` hook provides:
 ### Example Usage
 
 ```tsx
-import { useAuth } from './hooks/useAuth';
+import { useAuth } from './hooks/useAuth'
 
 function MyComponent() {
-  const { user, signIn, signOut } = useAuth();
+  const { user, signIn, signOut } = useAuth()
 
   const handleLogin = async () => {
-    await signIn({ email: 'user@example.com', password: 'password' });
-  };
+    await signIn({ email: 'user@example.com', password: 'password' })
+  }
 
   return (
     <div>
@@ -213,7 +231,7 @@ function MyComponent() {
         <button onClick={handleLogin}>Login</button>
       )}
     </div>
-  );
+  )
 }
 ```
 
@@ -238,38 +256,39 @@ GET    /api/backups                   # List backups
 ### Example Usage
 
 ```tsx
-import { apiClient } from './lib/axios';
+import { apiClient } from './lib/axios'
 
 // GET request - List transactions
 const fetchTransactions = async (userId: string) => {
   const response = await apiClient.get('/transactions', {
-    params: { user_id: userId }
-  });
-  return response.data;
-};
+    params: { user_id: userId },
+  })
+  return response.data
+}
 
 // POST request - Create transaction
 const createTransaction = async (data: TransactionData) => {
-  const response = await apiClient.post('/transactions', data);
-  return response.data;
-};
+  const response = await apiClient.post('/transactions', data)
+  return response.data
+}
 
 // PUT request - Update transaction
 const updateTransaction = async (id: number, data: TransactionData) => {
-  const response = await apiClient.put(`/transactions/${id}`, data);
-  return response.data;
-};
+  const response = await apiClient.put(`/transactions/${id}`, data)
+  return response.data
+}
 
 // DELETE request
 const deleteTransaction = async (id: number, userId: string) => {
   const response = await apiClient.delete(`/transactions/${id}`, {
-    params: { user_id: userId }
-  });
-  return response.data;
-};
+    params: { user_id: userId },
+  })
+  return response.data
+}
 ```
 
 The Axios instance automatically:
+
 - Adds authentication tokens to requests
 - Handles 401 (Unauthorized) responses
 - Sets default headers and timeout
@@ -279,6 +298,7 @@ For complete API documentation, see [Backend README](backend/README.md).
 ## 📜 Available Scripts
 
 ### Frontend Scripts
+
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
@@ -288,6 +308,7 @@ For complete API documentation, see [Backend README](backend/README.md).
 - `npm run format:check` - Check code formatting
 
 ### Backend Scripts
+
 - `cd backend && composer install` - Install dependencies
 - `php init-db.php` - Initialize database
 - `php -S localhost:8000` - Start development server (from backend/public)
@@ -296,24 +317,28 @@ For complete API documentation, see [Backend README](backend/README.md).
 ## 🎯 Coding Conventions
 
 ### TypeScript
+
 - Use TypeScript for all new files
 - Define interfaces for props and data structures
 - Use type inference where possible
 - Avoid `any` type unless absolutely necessary
 
 ### React Components
+
 - Use functional components with hooks
 - Name components with PascalCase
 - Keep components small and focused
 - Extract reusable logic into custom hooks
 
 ### File Naming
+
 - Components: PascalCase (e.g., `LoginForm.tsx`)
 - Hooks: camelCase with 'use' prefix (e.g., `useAuth.ts`)
 - Utilities: camelCase (e.g., `formatDate.ts`)
 - Types: camelCase with '.types' suffix (e.g., `auth.types.ts`)
 
 ### Code Style
+
 - Use ESLint and Prettier for consistent code style
 - Run `npm run lint:fix` before committing
 - Use meaningful variable and function names
@@ -321,6 +346,7 @@ For complete API documentation, see [Backend README](backend/README.md).
 - Keep functions small and focused (single responsibility)
 
 ### Git Commits
+
 - Write clear, descriptive commit messages
 - Use conventional commits format:
   - `feat:` - New feature
@@ -348,16 +374,19 @@ For complete API documentation, see [Backend README](backend/README.md).
 ## 🐛 Troubleshooting
 
 ### Supabase Connection Issues
+
 - Verify your Supabase URL and anon key in `.env`
 - Check if your Supabase project is active
 - Ensure authentication is enabled in Supabase dashboard
 
 ### Build Errors
+
 - Clear node_modules and reinstall: `rm -rf node_modules && npm install`
 - Clear Vite cache: `rm -rf node_modules/.vite`
 - Check Node.js version compatibility
 
 ### Styling Issues
+
 - Ensure Tailwind CSS is properly configured
 - Check if DaisyUI theme is correctly set
 - Verify PostCSS configuration
@@ -365,6 +394,7 @@ For complete API documentation, see [Backend README](backend/README.md).
 ## 📚 Additional Resources
 
 ### Frontend
+
 - [React Documentation](https://react.dev/)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Vite Documentation](https://vitejs.dev/)
@@ -374,6 +404,7 @@ For complete API documentation, see [Backend README](backend/README.md).
 - [Axios Documentation](https://axios-http.com/docs/intro)
 
 ### Backend
+
 - [PHP Manual](https://www.php.net/manual/)
 - [Slim Framework Documentation](https://www.slimframework.com/docs/)
 - [SQLite Documentation](https://www.sqlite.org/docs.html)

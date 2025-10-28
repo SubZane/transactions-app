@@ -1,30 +1,34 @@
-import axios from 'axios';
+import axios from 'axios'
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+import { supabase } from './supabase'
 
 // Create axios instance with default config
+// Note: baseURL is not set here because we use full URLs from env variables
 export const apiClient = axios.create({
-  baseURL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+})
 
 // Request interceptor for adding auth token
 apiClient.interceptors.request.use(
-  (config) => {
-    // Get token from localStorage or your auth state management
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  async (config) => {
+    // Get current Supabase session
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (session?.access_token) {
+      config.headers.Authorization = `Bearer ${session.access_token}`
     }
-    return config;
+
+    return config
   },
   (error) => {
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
+)
 
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
@@ -32,8 +36,8 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access (e.g., redirect to login)
-      console.error('Unauthorized access - redirecting to login');
+      console.error('Unauthorized access - redirecting to login')
     }
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
+)

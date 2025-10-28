@@ -1,8 +1,8 @@
-import type { User } from '../types/auth.types';
+import type { User } from '../types/auth.types'
 
 interface HeaderProps {
-  user: User | null;
-  onLogout: () => void;
+  user: User | null
+  onLogout: () => void
 }
 
 export const Header = ({ user, onLogout }: HeaderProps) => {
@@ -40,5 +40,5 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
         ) : null}
       </div>
     </div>
-  );
-};
+  )
+}

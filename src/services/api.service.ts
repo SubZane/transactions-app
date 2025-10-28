@@ -3,7 +3,7 @@
  * This is an example service demonstrating how to use the axios instance
  */
 
-import { apiClient } from '../lib/axios';
+import { apiClient } from '../lib/axios'
 
 /**
  * Example: Fetch user profile
@@ -11,9 +11,9 @@ import { apiClient } from '../lib/axios';
  * @returns User profile data
  */
 export const getUserProfile = async (userId: string) => {
-  const response = await apiClient.get(`/users/${userId}`);
-  return response.data;
-};
+  const response = await apiClient.get(`/users/${userId}`)
+  return response.data
+}
 
 /**
  * Example: Update user profile
@@ -22,9 +22,9 @@ export const getUserProfile = async (userId: string) => {
  * @returns Updated user profile
  */
 export const updateUserProfile = async (userId: string, data: Record<string, unknown>) => {
-  const response = await apiClient.put(`/users/${userId}`, data);
-  return response.data;
-};
+  const response = await apiClient.put(`/users/${userId}`, data)
+  return response.data
+}
 
 /**
  * Example: Fetch transactions
@@ -32,9 +32,9 @@ export const updateUserProfile = async (userId: string, data: Record<string, unk
  * @returns List of transactions
  */
 export const getTransactions = async (params?: Record<string, unknown>) => {
-  const response = await apiClient.get('/transactions', { params });
-  return response.data;
-};
+  const response = await apiClient.get('/transactions', { params })
+  return response.data
+}
 
 /**
  * Example: Create a new transaction
@@ -42,9 +42,9 @@ export const getTransactions = async (params?: Record<string, unknown>) => {
  * @returns Created transaction
  */
 export const createTransaction = async (data: Record<string, unknown>) => {
-  const response = await apiClient.post('/transactions', data);
-  return response.data;
-};
+  const response = await apiClient.post('/transactions', data)
+  return response.data
+}
 
 /**
  * Example: Delete a transaction
@@ -52,6 +52,6 @@ export const createTransaction = async (data: Record<string, unknown>) => {
  * @returns Deletion confirmation
  */
 export const deleteTransaction = async (transactionId: string) => {
-  const response = await apiClient.delete(`/transactions/${transactionId}`);
-  return response.data;
-};
+  const response = await apiClient.delete(`/transactions/${transactionId}`)
+  return response.data
+}

@@ -15,20 +15,45 @@ Get up and running with the Transactions App in 5 minutes.
 npm install
 ```
 
-### 2. Configure Environment Variables (Optional)
+### 2. Configure Environment Variables
 
-For full functionality with Supabase authentication:
+Copy the example environment file:
 
 ```bash
 cp .env.example .env
 ```
 
 Edit `.env` and add your Supabase credentials:
+
+**Supabase Configuration (Secret):**
+
 - Get your Supabase URL and anon key from [Supabase Dashboard](https://app.supabase.com/)
+- Add them to `.env` file only (this file is gitignored)
+
+**API Configuration (Public):**
+
+- API URLs are configured in `.env.development` and `.env.production`
+- Development: `VITE_API_BASE_URL=http://localhost/api` (Apache server on localhost)
+- Production: Update `.env.production` with your production API URL
+
+**Environment Files:**
+
+- `.env` - Contains secret Supabase credentials (gitignored)
+- `.env.development` - Development API URL (committed to repo)
+- `.env.production` - Production API URL (committed to repo)
+- `.env.example` - Template showing all required variables
 
 > **Note**: The app will run without Supabase credentials for development purposes, but authentication features will not work.
 
-### 3. Start Development Server
+### 3. Backend Setup (Optional)
+
+The backend PHP API runs on Apache at `http://localhost/api`. Ensure:
+
+1. Apache is running
+2. The `backend/` directory is accessible
+3. SQLite database is initialized (run `backend/init-simple.php` if needed)
+
+### 4. Start Development Server
 
 ```bash
 npm run dev
@@ -44,7 +69,7 @@ The app will open at `http://localhost:3000`
 ✅ **DaisyUI** - Beautiful UI components  
 ✅ **Supabase** - Authentication ready  
 ✅ **Axios** - HTTP client configured  
-✅ **ESLint & Prettier** - Code quality tools  
+✅ **ESLint & Prettier** - Code quality tools
 
 ## Project Structure
 
@@ -87,13 +112,17 @@ npm run format       # Format code
 ## Common Issues
 
 ### Supabase Warning
+
 If you see a Supabase warning in the console, it's normal during development. The app uses placeholder credentials when real ones aren't configured.
 
 ### Port Already in Use
+
 If port 3000 is in use, the app will automatically try the next available port.
 
 ### Build Errors
+
 Clear cache and reinstall:
+
 ```bash
 rm -rf node_modules node_modules/.vite
 npm install

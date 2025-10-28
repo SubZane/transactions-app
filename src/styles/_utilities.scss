@@ -1,0 +1,81 @@
+// =============================================================================
+// CUSTOM UTILITY CLASSES
+// =============================================================================
+
+// Elevation classes
+.elevation-none {
+  box-shadow: none !important;
+}
+
+.elevation-sm {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+.elevation-md {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+// Transition utilities
+.transition-shadow {
+  transition: box-shadow 150ms ease;
+}
+
+.transition-colors {
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+// Card variants
+.card-flat {
+  @apply bg-base-100 border border-base-300;
+  box-shadow: none;
+}
+
+.card-interactive {
+  @apply bg-base-100 border border-base-300 transition-shadow;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+}
+
+// Transaction card specific
+.transaction-card {
+  @apply bg-base-100 border border-base-300 transition-all;
+  box-shadow: none;
+
+  .card-body {
+    @apply p-4;
+  }
+
+  &:hover {
+    @apply border-primary/30 bg-base-100;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  }
+}
+
+// Summary card with colored accents
+.summary-card {
+  @apply bg-base-100 border border-base-300;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  .card-body {
+    @apply p-4;
+  }
+
+  &.summary-card-balance {
+    @apply border-l-4 border-l-primary;
+  }
+
+  &.summary-card-income {
+    @apply border-l-4 border-l-success;
+  }
+
+  &.summary-card-expense {
+    @apply border-l-4 border-l-error;
+  }
+}

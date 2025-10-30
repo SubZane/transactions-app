@@ -1,11 +1,9 @@
 import { useState } from 'react'
 
-import {
-  ArrowRightOnRectangleIcon,
-  EnvelopeIcon,
-  ExclamationCircleIcon,
-  LockClosedIcon,
-} from '@heroicons/react/24/solid'
+import EmailIcon from '@mui/icons-material/Email'
+import LockIcon from '@mui/icons-material/Lock'
+import LoginIcon from '@mui/icons-material/Login'
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 
 import type { LoginCredentials } from '../types/auth.types'
 
@@ -31,42 +29,40 @@ export const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
   }
 
   return (
-    <div className="w-full max-w-md">
-      {/* Logo/Brand Section */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-4 shadow-lg">
-          <ArrowRightOnRectangleIcon className="h-8 w-8 text-primary-content" />
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-emerald-500 to-emerald-700 px-4 py-8">
+      <div className="w-full max-w-md">
+        {/* Logo/Brand Section */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl mb-4 shadow-xl">
+            <ReceiptLongIcon sx={{ fontSize: 40 }} className="text-emerald-600" />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-2">Transactions App</h1>
+          <p className="text-white/80 text-sm">Manage your finances together</p>
         </div>
-        <h1 className="text-3xl font-bold text-base-content">Transactions App</h1>
-        <p className="text-base-content/60 mt-2">Sign in to manage your transactions</p>
-      </div>
 
-      {/* Login Card */}
-      <div className="card bg-base-100 shadow-2xl border border-base-300">
-        <div className="card-body p-8">
-          <h2 className="text-2xl font-semibold text-center mb-6">Welcome Back</h2>
+        {/* Login Card */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8">
+          <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Welcome Back</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="alert alert-error shadow-lg">
-                <ExclamationCircleIcon className="h-6 w-6" />
-                <span>{error}</span>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                <div className="text-red-600 text-sm">{error}</div>
               </div>
             )}
 
             {/* Email Input */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Email Address</span>
-              </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <EnvelopeIcon className="h-5 w-5 text-base-content/40" />
-                </div>
+                <EmailIcon
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  sx={{ fontSize: 20 }}
+                />
                 <input
                   type="email"
                   placeholder="you@example.com"
-                  className="input input-bordered w-full pl-12 focus:input-primary"
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -77,18 +73,17 @@ export const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
             </div>
 
             {/* Password Input */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Password</span>
-              </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <LockClosedIcon className="h-5 w-5 text-base-content/40" />
-                </div>
+                <LockIcon
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  sx={{ fontSize: 20 }}
+                />
                 <input
                   type="password"
                   placeholder="Enter your password"
-                  className="input input-bordered w-full pl-12 focus:input-primary"
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -98,41 +93,30 @@ export const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
               </div>
             </div>
 
-            {/* Remember Me */}
-            <div className="form-control">
-              <label className="label cursor-pointer justify-start gap-3">
-                <input type="checkbox" className="checkbox checkbox-primary checkbox-sm" />
-                <span className="label-text">Remember me for 30 days</span>
-              </label>
-            </div>
-
             {/* Submit Button */}
-            <div className="form-control mt-8">
-              <button
-                type="submit"
-                className="btn btn-soft-primary btn-lg w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <span className="loading loading-spinner"></span>
-                    Signing in...
-                  </>
-                ) : (
-                  <>
-                    <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                    Sign In
-                  </>
-                )}
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="w-full mt-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <>
+                  <LoginIcon sx={{ fontSize: 20 }} />
+                  <span>Sign In</span>
+                </>
+              )}
+            </button>
           </form>
         </div>
-      </div>
 
-      {/* Footer */}
-      <div className="text-center mt-8 text-sm text-base-content/50">
-        <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
+        {/* Footer */}
+        <div className="text-center mt-6 text-sm text-white/70">
+          <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
+        </div>
       </div>
     </div>
   )

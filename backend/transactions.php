@@ -104,12 +104,13 @@ try {
 /**
  * Get all transactions for authenticated user
  * Requires authentication
+ * NOTE: For couple's finance app, shows transactions from ALL users
  */
 function getAllTransactions($db)
 {
 	$user = requireAuth();
 
-	// Get user_id from users table
+	// Get user_id from users table to verify authentication
 	$stmt = $db->prepare("SELECT id FROM users WHERE user_id = ?");
 	$stmt->execute([$user]);
 	$dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -120,6 +121,8 @@ function getAllTransactions($db)
 		return;
 	}
 
+	// Get ALL transactions (not just the authenticated user's)
+	// This is intentional for a couple's shared finance app
 	$stmt = $db->prepare("
         SELECT
             t.id,
@@ -139,22 +142,22 @@ function getAllTransactions($db)
         FROM transactions t
         LEFT JOIN categories c ON t.category_id = c.id
         LEFT JOIN users u ON t.user_id = u.id
-        WHERE t.user_id = ?
         ORDER BY t.transaction_date DESC, t.created_at DESC
     ");
-	$stmt->execute([$dbUser['id']]);
+	$stmt->execute();
 	echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 /**
  * Get transaction by ID
- * Requires authentication and ownership
+ * Requires authentication
+ * NOTE: For couple's finance app, allows viewing any transaction (not just owned by user)
  */
 function getTransactionById($db, $id)
 {
 	$user = requireAuth();
 
-	// Get user_id from users table
+	// Get user_id from users table to verify authentication
 	$stmt = $db->prepare("SELECT id FROM users WHERE user_id = ?");
 	$stmt->execute([$user]);
 	$dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -165,6 +168,7 @@ function getTransactionById($db, $id)
 		return;
 	}
 
+	// Get transaction by ID (removed user ownership check for couples' shared view)
 	$stmt = $db->prepare("
         SELECT
             t.id,
@@ -184,9 +188,9 @@ function getTransactionById($db, $id)
         FROM transactions t
         LEFT JOIN categories c ON t.category_id = c.id
         LEFT JOIN users u ON t.user_id = u.id
-        WHERE t.id = ? AND t.user_id = ?
+        WHERE t.id = ?
     ");
-	$stmt->execute([$id, $dbUser['id']]);
+	$stmt->execute([$id]);
 	$transaction = $stmt->fetch(PDO::FETCH_ASSOC);
 
 	if (!$transaction) {
@@ -253,7 +257,8 @@ function getTransactionsByUserId($db, $userId)
 
 /**
  * Get transactions by type (deposit or expense)
- * Requires authentication - returns only user's transactions
+ * Requires authentication
+ * NOTE: For couple's finance app, shows transactions from ALL users
  */
 function getTransactionsByType($db, $type)
 {
@@ -267,7 +272,7 @@ function getTransactionsByType($db, $type)
 		return;
 	}
 
-	// Get user_id from users table
+	// Get user_id from users table to verify authentication
 	$stmt = $db->prepare("SELECT id FROM users WHERE user_id = ?");
 	$stmt->execute([$user]);
 	$dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -278,6 +283,8 @@ function getTransactionsByType($db, $type)
 		return;
 	}
 
+	// Get ALL transactions of this type (not just the authenticated user's)
+	// This is intentional for a couple's shared finance app
 	$stmt = $db->prepare("
         SELECT
             t.id,
@@ -297,10 +304,10 @@ function getTransactionsByType($db, $type)
         FROM transactions t
         LEFT JOIN categories c ON t.category_id = c.id
         LEFT JOIN users u ON t.user_id = u.id
-        WHERE t.type = ? AND t.user_id = ?
+        WHERE t.type = ?
         ORDER BY t.transaction_date DESC, t.created_at DESC
     ");
-	$stmt->execute([$type, $dbUser['id']]);
+	$stmt->execute([$type]);
 	echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
@@ -476,7 +483,8 @@ function createTransaction($db)
 /**
  * Update transaction
  * All fields except user_id are editable
- * Requires authentication and ownership
+ * Requires authentication
+ * NOTE: For couple's finance app, allows editing any transaction (not just owned by user)
  */
 function updateTransaction($db, $id)
 {
@@ -484,7 +492,7 @@ function updateTransaction($db, $id)
 
 	$input = json_decode(file_get_contents('php://input'), true);
 
-	// Get user_id from users table
+	// Get user_id from users table to verify authentication
 	$stmt = $db->prepare("SELECT id FROM users WHERE user_id = ?");
 	$stmt->execute([$user]);
 	$dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -495,9 +503,9 @@ function updateTransaction($db, $id)
 		return;
 	}
 
-	// Check if transaction exists and user owns it
-	$stmt = $db->prepare("SELECT id, type FROM transactions WHERE id = ? AND user_id = ?");
-	$stmt->execute([$id, $dbUser['id']]);
+	// Check if transaction exists (removed user ownership check for couples' shared view)
+	$stmt = $db->prepare("SELECT id, type FROM transactions WHERE id = ?");
+	$stmt->execute([$id]);
 	$transaction = $stmt->fetch(PDO::FETCH_ASSOC);
 
 	if (!$transaction) {
@@ -623,13 +631,14 @@ function updateTransaction($db, $id)
 
 /**
  * Delete transaction
- * Requires authentication and ownership
+ * Requires authentication
+ * NOTE: For couple's finance app, allows deleting any transaction (not just owned by user)
  */
 function deleteTransaction($db, $id)
 {
 	$user = requireAuth();
 
-	// Get user_id from users table
+	// Get user_id from users table to verify authentication
 	$stmt = $db->prepare("SELECT id FROM users WHERE user_id = ?");
 	$stmt->execute([$user]);
 	$dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -640,9 +649,9 @@ function deleteTransaction($db, $id)
 		return;
 	}
 
-	// Delete only if user owns the transaction
-	$stmt = $db->prepare("DELETE FROM transactions WHERE id = ? AND user_id = ?");
-	$stmt->execute([$id, $dbUser['id']]);
+	// Delete transaction (removed user ownership check for couples' shared view)
+	$stmt = $db->prepare("DELETE FROM transactions WHERE id = ?");
+	$stmt->execute([$id]);
 
 	if ($stmt->rowCount() === 0) {
 		http_response_code(404);

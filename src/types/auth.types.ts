@@ -1,5 +1,6 @@
 export interface User {
-  id: string
+  id: string // Supabase UUID
+  dbId?: number // Database ID
   email: string
   name?: string
   avatar?: string

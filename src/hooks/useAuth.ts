@@ -34,6 +34,7 @@ export const useAuth = () => {
       setAuthState({
         user: {
           id: session.user.id,
+          dbId: dbUser.id, // Add database ID
           email: session.user.email || '',
           name: session.user.user_metadata?.name,
           avatar: session.user.user_metadata?.avatar_url,

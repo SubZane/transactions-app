@@ -1,7 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { Dock } from './components/common/Dock'
+import { InstallPWA } from './components/InstallPWA'
 import { LoginForm } from './components/LoginForm'
+import { ScrollToTop } from './components/ScrollToTop'
 import { useAuth } from './hooks/useAuth'
 import { AddTransactionPage } from './pages/AddTransactionPage'
 import { MyTransactionsPage } from './pages/MyTransactionsPage'
@@ -20,15 +22,12 @@ function App() {
   }
 
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-base-200 to-base-300 px-4 py-8">
-        <LoginForm onSubmit={signIn} />
-      </div>
-    )
+    return <LoginForm onSubmit={signIn} />
   }
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="min-h-screen bg-base-100 pb-24">
         <main>
           <Routes>
@@ -41,6 +40,7 @@ function App() {
           </Routes>
         </main>
         <Dock />
+        <InstallPWA />
       </div>
     </BrowserRouter>
   )

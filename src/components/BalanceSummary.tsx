@@ -1,9 +1,5 @@
-interface BalanceSummaryProps {
-  netBalance: number
-  totalDeposits: number
-  totalExpenses: number
-  title?: string
-}
+import type { BalanceSummaryProps } from '../types'
+import { formatCurrency } from '../utils/formatters'
 
 export const BalanceSummary = ({
   netBalance,
@@ -11,15 +7,6 @@ export const BalanceSummary = ({
   totalExpenses,
   title = 'Balance Overview',
 }: BalanceSummaryProps) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('sv-SE', {
-      style: 'currency',
-      currency: 'SEK',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value)
-  }
-
   return (
     <div className="mb-0">
       <h2 className="text-white text-lg font-semibold mb-3 text-center">{title}</h2>

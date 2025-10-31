@@ -5,12 +5,9 @@ import LockIcon from '@mui/icons-material/Lock'
 import LoginIcon from '@mui/icons-material/Login'
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 
-import type { LoginCredentials } from '../types/auth.types'
+import { Alert } from './common/Alert'
 
-interface LoginFormProps {
-  onSubmit: (credentials: LoginCredentials) => Promise<unknown>
-  isLoading?: boolean
-}
+import type { LoginFormProps } from '../types'
 
 export const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
   const [email, setEmail] = useState('')
@@ -29,40 +26,38 @@ export const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-emerald-500 to-emerald-700 px-4 py-8">
+    <div className="h-screen overflow-hidden flex items-center justify-center bg-linear-to-br from-emerald-500 to-emerald-700 px-4">
       <div className="w-full max-w-md">
         {/* Logo/Brand Section */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl mb-4 shadow-xl">
-            <ReceiptLongIcon sx={{ fontSize: 40 }} className="text-emerald-600" />
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-3xl mb-3 shadow-xl">
+            <ReceiptLongIcon sx={{ fontSize: 36 }} className="text-emerald-600" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Transactions App</h1>
+          <h1 className="text-3xl font-bold text-white mb-1">Transactions App</h1>
           <p className="text-white/80 text-sm">Manage your finances together</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Welcome Back</h2>
+        <div className="bg-white rounded-2xl shadow-2xl p-6">
+          <h2 className="text-xl font-bold text-gray-800 text-center mb-5">Welcome Back</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                <div className="text-red-600 text-sm">{error}</div>
-              </div>
-            )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && <Alert message={error} variant="error" showIcon={false} />}
 
             {/* Email Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email Address
+              </label>
               <div className="relative">
                 <EmailIcon
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                  sx={{ fontSize: 20 }}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  sx={{ fontSize: 18 }}
                 />
                 <input
                   type="email"
                   placeholder="you@example.com"
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -74,16 +69,16 @@ export const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
 
             {/* Password Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
               <div className="relative">
                 <LockIcon
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                  sx={{ fontSize: 20 }}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  sx={{ fontSize: 18 }}
                 />
                 <input
                   type="password"
                   placeholder="Enter your password"
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -96,16 +91,16 @@ export const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full mt-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full mt-2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   <span>Signing in...</span>
                 </>
               ) : (
                 <>
-                  <LoginIcon sx={{ fontSize: 20 }} />
+                  <LoginIcon sx={{ fontSize: 18 }} />
                   <span>Sign In</span>
                 </>
               )}
@@ -114,7 +109,7 @@ export const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-6 text-sm text-white/70">
+        <div className="text-center mt-4 text-xs text-white/70">
           <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
         </div>
       </div>

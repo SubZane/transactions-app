@@ -1,9 +1,4 @@
-import type { User } from '../types/auth.types'
-
-interface HeaderProps {
-  user: User | null
-  onLogout: () => void
-}
+import type { HeaderProps } from '../types'
 
 export const Header = ({ user, onLogout }: HeaderProps) => {
   return (
@@ -16,13 +11,12 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
           <div className="dropdown dropdown-end">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
               <div className="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
-                <span className="text-xl">{user.email[0].toUpperCase()}</span>
+                <span className="text-xl">{user.email?.[0].toUpperCase() || 'U'}</span>
               </div>
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-200 rounded-box w-52"
-            >
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-200 rounded-box w-52">
               <li>
                 <a className="justify-between">
                   Profile

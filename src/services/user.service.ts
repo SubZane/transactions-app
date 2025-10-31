@@ -2,22 +2,12 @@ import { AxiosError } from 'axios'
 
 import { apiClient } from '../lib/axios'
 
+import type { UserProfile, UpdateUserProfileData } from '../types'
+
 const API_USERS_URL = import.meta.env.VITE_API_USERS_URL
 
-export interface UserProfile {
-  id: number
-  user_id: string
-  email: string
-  firstname: string
-  surname: string
-  created_at: string
-  updated_at: string
-}
-
-export interface UpdateUserProfileData {
-  firstname?: string
-  surname?: string
-}
+// Re-export types for backward compatibility
+export type { UserProfile, UpdateUserProfileData }
 
 export const userService = {
   /**

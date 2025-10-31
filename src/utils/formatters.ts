@@ -2,19 +2,46 @@
  * Utility functions for formatting data
  */
 
+import {
+  CURRENCY_SEK,
+  DATE_FORMAT_LONG,
+  DATE_FORMAT_MONTH_YEAR,
+  DATE_FORMAT_SHORT,
+  LOCALE_EN_US,
+  LOCALE_SV_SE,
+} from './constants'
+
 /**
- * Formats a date to a readable string
+ * Formats a date to a readable string (long format)
  * @param date - Date to format
  * @param locale - Locale string (default: 'en-US')
- * @returns Formatted date string
+ * @returns Formatted date string (e.g., "October 30, 2025")
  */
-export const formatDate = (date: Date | string, locale = 'en-US'): string => {
+export const formatDate = (date: Date | string, locale = LOCALE_EN_US): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date
-  return dateObj.toLocaleDateString(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  return dateObj.toLocaleDateString(locale, DATE_FORMAT_LONG)
+}
+
+/**
+ * Formats a date to a short readable string
+ * @param date - Date to format
+ * @param locale - Locale string (default: 'en-US')
+ * @returns Formatted date string (e.g., "Oct 30, 2025")
+ */
+export const formatDateShort = (date: Date | string, locale = LOCALE_EN_US): string => {
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  return new Intl.DateTimeFormat(locale, DATE_FORMAT_SHORT).format(dateObj)
+}
+
+/**
+ * Formats a date to show only month and year
+ * @param date - Date to format
+ * @param locale - Locale string (default: 'en-US')
+ * @returns Formatted date string (e.g., "October 2025")
+ */
+export const formatMonthYear = (date: Date | string, locale = LOCALE_EN_US): string => {
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  return new Intl.DateTimeFormat(locale, DATE_FORMAT_MONTH_YEAR).format(dateObj)
 }
 
 /**
@@ -24,7 +51,11 @@ export const formatDate = (date: Date | string, locale = 'en-US'): string => {
  * @param locale - Locale for formatting (default: 'sv-SE')
  * @returns Formatted currency string
  */
-export const formatCurrency = (amount: number, currency = 'SEK', locale = 'sv-SE'): string => {
+export const formatCurrency = (
+  amount: number,
+  currency = CURRENCY_SEK,
+  locale = LOCALE_SV_SE
+): string => {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,

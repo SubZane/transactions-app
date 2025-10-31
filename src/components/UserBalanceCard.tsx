@@ -1,20 +1,7 @@
-interface UserBalanceCardProps {
-  name: string
-  netAmount: number
-  deposits: number
-  expenses: number
-}
+import type { UserBalanceCardProps } from '../types'
+import { formatCurrency } from '../utils/formatters'
 
 export const UserBalanceCard = ({ name, netAmount, deposits, expenses }: UserBalanceCardProps) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('sv-SE', {
-      style: 'currency',
-      currency: 'SEK',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value)
-  }
-
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
       <h3 className="text-white font-medium mb-2 text-sm">{name}</h3>

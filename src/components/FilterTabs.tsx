@@ -3,12 +3,7 @@ import { useState } from 'react'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import SearchIcon from '@mui/icons-material/Search'
 
-interface FilterTabsProps {
-  activeFilter: 'all' | 'deposit' | 'expense'
-  onFilterChange: (filter: 'all' | 'deposit' | 'expense') => void
-  searchQuery?: string
-  onSearchChange?: (query: string) => void
-}
+import type { FilterTabsProps } from '../types'
 
 export const FilterTabs = ({
   activeFilter,

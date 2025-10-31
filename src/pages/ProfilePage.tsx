@@ -2,38 +2,64 @@ import { useState } from 'react'
 import * as XLSX from 'xlsx'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import CachedIcon from '@mui/icons-material/Cached'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import DownloadIcon from '@mui/icons-material/Download'
 import EmailIcon from '@mui/icons-material/Email'
+import LogoutIcon from '@mui/icons-material/Logout'
 import SaveIcon from '@mui/icons-material/Save'
 
+import { Alert } from '../components/common/Alert'
 import { useAuth } from '../hooks/useAuth'
 import { transactionService } from '../services/transaction.service'
 import { userService } from '../services/user.service'
+import { formatDate } from '../utils/formatters'
 
-interface ProfilePageProps {
-  user: {
-    id: string
-    email?: string
-    firstname?: string
-    surname?: string
-    user_metadata?: {
-      firstname?: string
-      surname?: string
-    }
-    created_at?: string
-  }
-}
+import type { ProfilePageProps } from '../types'
 
 export const ProfilePage = ({ user }: ProfilePageProps) => {
-  const { refreshUserProfile } = useAuth()
+  const { refreshUserProfile, signOut } = useAuth()
   const [firstname, setFirstname] = useState(user.firstname || user.user_metadata?.firstname || '')
   const [surname, setSurname] = useState(user.surname || user.user_metadata?.surname || '')
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [isClearing, setIsClearing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+
+  const handleClearCache = async () => {
+    setIsClearing(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      // Unregister service workers
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations()
+        for (const registration of registrations) {
+          await registration.unregister()
+        }
+      }
+
+      // Clear all caches
+      if ('caches' in window) {
+        const cacheNames = await caches.keys()
+        await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)))
+      }
+
+      setSuccess('Cache cleared successfully! Reloading...')
+
+      // Reload the page after a short delay
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
+    } catch (err) {
+      console.error('Error clearing cache:', err)
+      setError('Failed to clear cache. Please try again.')
+      setIsClearing(false)
+    }
+  }
 
   const handleExportToExcel = async () => {
     setIsExporting(true)
@@ -46,7 +72,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
 
       // Prepare data for Excel
       const excelData = transactions.map((t) => ({
-        Date: new Date(t.transaction_date).toLocaleDateString(),
+        Date: formatDate(t.transaction_date),
         User: `${t.user_firstname} ${t.user_surname}`,
         Category: t.category_name || 'Deposit',
         Type: t.type === 'deposit' ? 'Deposit' : 'Expense',
@@ -117,8 +143,10 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Top Section with Emerald Green Background */}
-      <div className="bg-emerald-600">
+      {/* Top Section with Emerald Green Background - Fixed */}
+      <div
+        className="fixed top-0 left-0 right-0 bg-emerald-600 z-40 shadow-lg backdrop-blur-sm"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-3xl">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Profile</h1>
           <p className="text-white/80 text-sm">Manage your account information</p>
@@ -126,7 +154,11 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
       </div>
 
       {/* Content Section */}
-      <div className="container mx-auto px-3 sm:px-4 py-6 max-w-3xl space-y-6">
+      <div
+        className="container mx-auto px-3 sm:px-4 py-6 max-w-3xl space-y-6"
+        style={{
+          paddingTop: 'calc(8rem + env(safe-area-inset-top))',
+        }}>
         {/* Profile Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           {/* Avatar Section */}
@@ -209,18 +241,10 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
             </div>
 
             {/* Success Message */}
-            {success && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
-                <span className="text-green-800 text-sm">{success}</span>
-              </div>
-            )}
+            {success && <Alert message={success} variant="success" />}
 
             {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
-                <span className="text-red-800 text-sm">{error}</span>
-              </div>
-            )}
+            {error && <Alert message={error} variant="error" className="mt-4" />}
           </div>
         </div>
 
@@ -253,13 +277,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
                 <CalendarMonthIcon sx={{ fontSize: 20 }} className="text-gray-400 mt-1" />
                 <div className="flex-1">
                   <p className="text-sm text-gray-500">Member Since</p>
-                  <p className="font-medium text-gray-900">
-                    {new Date(user.created_at).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
+                  <p className="font-medium text-gray-900">{formatDate(user.created_at)}</p>
                 </div>
               </div>
             )}
@@ -289,6 +307,49 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
                 Export to Excel
               </>
             )}
+          </button>
+        </div>
+
+        {/* App Settings Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">App Settings</h3>
+
+          <p className="text-sm text-gray-600 mb-4">
+            Clear cached data and refresh the app. This will unregister the service worker and clear
+            all cached files.
+          </p>
+
+          <button
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleClearCache}
+            disabled={isClearing}>
+            {isClearing ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                Clearing...
+              </>
+            ) : (
+              <>
+                <CachedIcon sx={{ fontSize: 18 }} />
+                Clear Cache & Reload
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Logout Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Sign Out</h3>
+
+          <p className="text-sm text-gray-600 mb-4">
+            Sign out of your account and return to the login screen.
+          </p>
+
+          <button
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+            onClick={signOut}>
+            <LogoutIcon sx={{ fontSize: 18 }} />
+            Sign Out
           </button>
         </div>
       </div>

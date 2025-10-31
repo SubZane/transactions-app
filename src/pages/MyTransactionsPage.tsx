@@ -1,74 +1,35 @@
-import { useEffect, useState } from 'react'
-
 import { BalanceSummary } from '../components/BalanceSummary'
 import { FilterTabs } from '../components/FilterTabs'
+import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { TransactionList } from '../components/TransactionList'
 import { useAuth } from '../hooks/useAuth'
-import { Transaction, transactionService } from '../services/transaction.service'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import { useTransactions } from '../hooks/useTransactions'
 
 export const MyTransactionsPage = () => {
-  const { user } = useAuth()
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'deposit' | 'expense'>('all')
-  const [searchQuery, setSearchQuery] = useState('')
+  const { user, isLoading: isAuthLoading } = useAuth()
 
-  useEffect(() => {
-    loadTransactions()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
+  const {
+    transactions,
+    filteredTransactions,
+    isLoading,
+    error,
+    filter,
+    searchQuery,
+    setFilter,
+    setSearchQuery,
+    reload,
+  } = useTransactions({
+    userId: user?.dbId,
+    autoLoad: !!user?.dbId,
+  })
 
-  // Filter transactions locally when filter changes
-  useEffect(() => {
-    if (filter === 'all') {
-      setFilteredTransactions(transactions)
-    } else {
-      setFilteredTransactions(transactions.filter((t) => t.type === filter))
-    }
-  }, [filter, transactions])
-
-  const loadTransactions = async () => {
-    if (!user) {
-      setError('User not authenticated')
-      setIsLoading(false)
-      return
-    }
-
-    if (!user.dbId) {
-      setError('User database ID not found. Please try logging out and back in.')
-      setIsLoading(false)
-      return
-    }
-
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      // Get all transactions and filter by current user's database ID
-      const data = await transactionService.getAll()
-
-      const userTransactions = Array.isArray(data)
-        ? data.filter((t) => t.user_id === user.dbId)
-        : []
-
-      setTransactions(userTransactions)
-      setFilteredTransactions(userTransactions)
-    } catch (err) {
-      console.error('Error loading transactions:', err)
-      setError('Failed to load transactions. Please try again.')
-      setTransactions([])
-      setFilteredTransactions([])
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadTransactions()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // Pull to refresh
+  const { pullDistance, isRefreshing, shouldTrigger } = usePullToRefresh({
+    onRefresh: reload,
+    threshold: 80,
+    resistance: 2.5,
+  })
 
   const getTotalByType = (type: 'deposit' | 'expense') => {
     if (!Array.isArray(transactions)) return 0
@@ -81,7 +42,8 @@ export const MyTransactionsPage = () => {
     return deposits - expenses
   }
 
-  if (isLoading) {
+  // Show loading while auth is loading or transactions are loading
+  if (isAuthLoading || (isLoading && !user)) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
@@ -89,10 +51,31 @@ export const MyTransactionsPage = () => {
     )
   }
 
+  // Show error if user is not authenticated after loading
+  if (!user || !user.dbId) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">User not authenticated</p>
+          <p className="text-gray-600 text-sm">Please try logging out and back in.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div
+      className="min-h-screen bg-gray-50 pb-24"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      {/* Pull to Refresh Indicator */}
+      <PullToRefreshIndicator
+        pullDistance={pullDistance}
+        isRefreshing={isRefreshing}
+        shouldTrigger={shouldTrigger}
+      />
+
       {/* Top Section with Emerald Green Background */}
-      <div className="bg-emerald-600">
+      <div className="bg-emerald-600" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
           {/* User Balance */}
           <BalanceSummary

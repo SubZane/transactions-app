@@ -1,19 +1,68 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
+import CardTravelIcon from '@mui/icons-material/CardTravel'
+import ChildCareIcon from '@mui/icons-material/ChildCare'
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'
 import EditIcon from '@mui/icons-material/Edit'
+import FastfoodIcon from '@mui/icons-material/Fastfood'
+import HomeIcon from '@mui/icons-material/Home'
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import ReceiptIcon from '@mui/icons-material/Receipt'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import SchoolIcon from '@mui/icons-material/School'
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag'
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
+import TheaterComedyIcon from '@mui/icons-material/TheaterComedy'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import WorkIcon from '@mui/icons-material/Work'
 
-import { Transaction } from '../services/transaction.service'
+import { formatCurrency, formatDateShort, formatMonthYear } from '../utils/formatters'
+import { Alert } from './common/Alert'
 
-interface TransactionListProps {
-  transactions: Transaction[]
-  isLoading?: boolean
-  error?: string | null
-  emptyMessage?: string
-  emptyDescription?: string
-  searchQuery?: string
+import type { Transaction } from '../services/transaction.service'
+import type { TransactionListProps } from '../types'
+
+// Category icon mapping
+const getCategoryIcon = (categoryName: string | null, type: 'deposit' | 'expense') => {
+  if (type === 'deposit') {
+    return <AccountBalanceIcon sx={{ fontSize: 'inherit' }} />
+  }
+
+  const name = categoryName?.toLowerCase() || ''
+
+  // Match category names (with plural/singular variations)
+  if (name.includes('child')) return <ChildCareIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('grocer')) return <ShoppingCartIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('car') || name.includes('petrol') || name.includes('transport'))
+    return <DirectionsCarIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('restaurant')) return <FastfoodIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('entertainment')) return <TheaterComedyIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('health')) return <LocalHospitalIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('bill')) return <ReceiptIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('utilit')) return <HomeIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('travel') || name.includes('vacation') || name.includes('trip'))
+    return <CardTravelIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('shop')) return <ShoppingBagIcon sx={{ fontSize: 'inherit' }} />
+  if (
+    name.includes('hous') ||
+    name.includes('home') ||
+    name.includes('rent') ||
+    name.includes('renov')
+  )
+    return <HomeIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('educat') || name.includes('school'))
+    return <SchoolIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('invest')) return <TrendingUpIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('freelance') || name.includes('salary') || name.includes('work'))
+    return <WorkIcon sx={{ fontSize: 'inherit' }} />
+  if (name.includes('other')) return <MoreHorizIcon sx={{ fontSize: 'inherit' }} />
+
+  // Default for unknown categories
+  return <MoreHorizIcon sx={{ fontSize: 'inherit' }} />
 }
 
 export const TransactionList = ({
@@ -29,38 +78,15 @@ export const TransactionList = ({
   const [displayedYears, setDisplayedYears] = useState<number[]>([currentYear])
 
   const formatAmount = (amount: number, type: 'deposit' | 'expense') => {
-    const formatted = new Intl.NumberFormat('sv-SE', {
-      style: 'currency',
-      currency: 'SEK',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount)
-
+    const formatted = formatCurrency(amount)
     return type === 'deposit' ? `+${formatted}` : `-${formatted}`
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }).format(date)
-  }
-
-  const getMonthYear = (dateString: string) => {
-    const date = new Date(dateString)
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'long',
-      year: 'numeric',
-    }).format(date)
   }
 
   const groupTransactionsByMonth = (transactions: Transaction[]) => {
     const grouped = new Map<string, Transaction[]>()
 
     transactions.forEach((transaction) => {
-      const monthYear = getMonthYear(transaction.transaction_date)
+      const monthYear = formatMonthYear(transaction.transaction_date)
       if (!grouped.has(monthYear)) {
         grouped.set(monthYear, [])
       }
@@ -115,11 +141,7 @@ export const TransactionList = ({
   }
 
   if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 sm:mb-6">
-        <span className="text-red-800">{error}</span>
-      </div>
-    )
+    return <Alert message={error} variant="error" className="mb-4 sm:mb-6" />
   }
 
   if (transactions.length === 0) {
@@ -171,8 +193,17 @@ export const TransactionList = ({
                   key={transaction.id}
                   className="bg-white rounded-lg border border-gray-200 hover:border-emerald-300 transition-colors">
                   <div className="p-3">
-                    {/* Top Row: Category, Amount, Edit Button */}
-                    <div className="flex items-start justify-between gap-2 mb-2">
+                    {/* Main Row: Icon, Category/User/Description, Date, Amount, Edit Button */}
+                    <div className="flex items-start gap-3">
+                      {/* Category Icon */}
+                      <div
+                        className={`text-xl flex-shrink-0 ${
+                          transaction.type === 'deposit' ? 'text-green-600' : 'text-gray-700'
+                        }`}>
+                        {getCategoryIcon(transaction.category_name, transaction.type)}
+                      </div>
+
+                      {/* Category, User, Description */}
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-base text-gray-900 leading-tight">
                           {transaction.type === 'deposit' ? 'Deposit' : transaction.category_name}
@@ -180,35 +211,33 @@ export const TransactionList = ({
                         <p className="text-xs text-gray-500 mt-0.5">
                           {transaction.user_firstname} {transaction.user_surname}
                         </p>
+                        {transaction.description && (
+                          <p className="text-xs text-gray-600 mt-1 italic line-clamp-2">
+                            {transaction.description}
+                          </p>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <p
-                          className={`text-lg font-bold ${
-                            transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                          {formatAmount(transaction.amount, transaction.type)}
-                        </p>
-                        <button
-                          className="p-1 text-gray-400 hover:text-emerald-600 transition-colors rounded"
-                          onClick={() => navigate(`/edit/${transaction.id}`)}
-                          aria-label={`Edit ${transaction.category_name} transaction`}>
-                          <EditIcon sx={{ fontSize: 16 }} />
-                        </button>
+
+                      {/* Date, Amount, Edit Button Column */}
+                      <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                        <span className="text-xs text-gray-500">
+                          {formatDateShort(transaction.transaction_date)}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <p
+                            className={`text-lg font-bold ${
+                              transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                            {formatAmount(transaction.amount, transaction.type)}
+                          </p>
+                          <button
+                            className="p-1 text-gray-400 hover:text-emerald-600 transition-colors rounded"
+                            onClick={() => navigate(`/edit/${transaction.id}`)}
+                            aria-label={`Edit ${transaction.category_name} transaction`}>
+                            <EditIcon sx={{ fontSize: 16 }} />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Description (if present) */}
-                    {transaction.description && (
-                      <p className="text-xs text-gray-600 mb-2 line-clamp-1">
-                        {transaction.description}
-                      </p>
-                    )}
-
-                    {/* Bottom Row: Date only */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">
-                        {formatDate(transaction.transaction_date)}
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -252,24 +281,33 @@ export const TransactionList = ({
                       key={transaction.id}
                       className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
                       {/* Description */}
-                      <div className="col-span-5 flex flex-col justify-center">
-                        <h3 className="font-semibold text-gray-900 text-base">
-                          {transaction.category_name}
-                        </h3>
-                        {transaction.description && (
-                          <p className="text-sm text-gray-600 mt-0.5 truncate">
-                            {transaction.description}
+                      <div className="col-span-5 flex items-start gap-3">
+                        {/* Category Icon */}
+                        <div
+                          className={`text-2xl shrink-0 ${
+                            transaction.type === 'deposit' ? 'text-green-600' : 'text-gray-700'
+                          }`}>
+                          {getCategoryIcon(transaction.category_name, transaction.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 text-base leading-tight">
+                            {transaction.category_name}
+                          </h3>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {transaction.user_firstname} {transaction.user_surname}
                           </p>
-                        )}
+                          {transaction.description && (
+                            <p className="text-sm text-gray-600 mt-1 italic line-clamp-2">
+                              {transaction.description}
+                            </p>
+                          )}
+                        </div>
                       </div>
 
                       {/* Date */}
-                      <div className="col-span-2 flex flex-col justify-center">
-                        <p className="text-sm text-gray-800">
-                          {formatDate(transaction.transaction_date)}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {transaction.user_firstname} {transaction.user_surname}
+                      <div className="col-span-2 flex items-center justify-end">
+                        <p className="text-sm text-gray-800 text-right">
+                          {formatDateShort(transaction.transaction_date)}
                         </p>
                       </div>
 

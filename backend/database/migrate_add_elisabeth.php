@@ -13,7 +13,7 @@
  */
 
 // Database configuration
-$dbPath = __DIR__ . '/../database.sqlite';
+$dbPath = __DIR__ . '/../../data/database.sqlite';
 
 // Step 1: Check if database exists
 if (!file_exists($dbPath)) {

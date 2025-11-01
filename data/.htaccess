@@ -1,0 +1,44 @@
+# Deny all access to the data directory
+
+# This prevents anyone from browsing or downloading the database file
+
+# Apache 2.4+
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+# Apache 2.2
+
+<IfModule !mod_authz_core.c>
+Order deny,allow
+Deny from all
+</IfModule>
+
+# Disable directory browsing
+
+Options -Indexes
+
+# Deny access to all files
+
+<Files \*>
+<IfModule mod_authz_core.c>
+Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+Order deny,allow
+Deny from all
+</IfModule>
+</Files>
+
+# Block common database file extensions
+
+<FilesMatch "\.(sqlite|sqlite3|db|db3|sql)$">
+<IfModule mod_authz_core.c>
+Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+Order deny,allow
+Deny from all
+</IfModule>
+</FilesMatch>

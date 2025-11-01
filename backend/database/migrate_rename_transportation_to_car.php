@@ -5,7 +5,8 @@
  * Updates the category name from "Transportation" to "Car" and updates its description and icon
  */
 
-$dbPath = __DIR__ . '/../database.sqlite';
+// Database configuration
+$dbPath = __DIR__ . '/../../data/database.sqlite';
 
 try {
 	$db = new PDO('sqlite:' . $dbPath);

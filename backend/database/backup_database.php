@@ -13,7 +13,8 @@
 
 function backupDatabase(): string|false
 {
-	$dbPath = __DIR__ . '/../database.sqlite';
+	// Database path
+	$dbPath = __DIR__ . '/../../data/database.sqlite';
 	$backupDir = __DIR__ . '/backups';
 
 	// Create backups directory if it doesn't exist

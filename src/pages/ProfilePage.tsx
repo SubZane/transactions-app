@@ -7,9 +7,12 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import CloudSyncIcon from '@mui/icons-material/CloudSync'
 import DownloadIcon from '@mui/icons-material/Download'
 import EmailIcon from '@mui/icons-material/Email'
+import LockIcon from '@mui/icons-material/Lock'
 import LogoutIcon from '@mui/icons-material/Logout'
 import SaveIcon from '@mui/icons-material/Save'
 import SyncIcon from '@mui/icons-material/Sync'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 
 import { Alert } from '../components/common/Alert'
 import { useAuth } from '../hooks/useAuth'
@@ -21,7 +24,7 @@ import { formatDate } from '../utils/formatters'
 import type { ProfilePageProps } from '../types'
 
 export const ProfilePage = ({ user }: ProfilePageProps) => {
-  const { refreshUserProfile, signOut } = useAuth()
+  const { refreshUserProfile, signOut, updatePassword } = useAuth()
   const { isOnline, isSyncing, lastSync, syncQueueCount, triggerSync } = useOffline()
   const [firstname, setFirstname] = useState(user.firstname || user.user_metadata?.firstname || '')
   const [surname, setSurname] = useState(user.surname || user.user_metadata?.surname || '')
@@ -31,6 +34,15 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
   const [isClearing, setIsClearing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+
+  // Password change state
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null)
 
   const handleClearCache = async () => {
     setIsClearing(true)
@@ -143,6 +155,48 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
     setError(null)
     setSuccess(null)
     setIsEditing(false)
+  }
+
+  const handlePasswordChange = async () => {
+    setPasswordError(null)
+    setPasswordSuccess(null)
+
+    // Validate inputs
+    if (!newPassword || !confirmPassword) {
+      setPasswordError('Please fill in all password fields')
+      return
+    }
+
+    if (newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters long')
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match')
+      return
+    }
+
+    setIsChangingPassword(true)
+
+    try {
+      await updatePassword(newPassword)
+      setPasswordSuccess('Password updated successfully!')
+
+      // Clear form
+      setNewPassword('')
+      setConfirmPassword('')
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setPasswordSuccess(null), 3000)
+    } catch (err) {
+      console.error('Error updating password:', err)
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to update password. Please try again.'
+      setPasswordError(errorMessage)
+    } finally {
+      setIsChangingPassword(false)
+    }
   }
 
   return (
@@ -285,6 +339,92 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Password Change Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <LockIcon sx={{ fontSize: 24 }} className="text-emerald-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
+          </div>
+
+          <div className="space-y-4">
+            {/* New Password */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
+              <div className="relative">
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password (min 6 characters)"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  {showNewPassword ? (
+                    <VisibilityOffIcon sx={{ fontSize: 20 }} />
+                  ) : (
+                    <VisibilityIcon sx={{ fontSize: 20 }} />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Confirm New Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  {showConfirmPassword ? (
+                    <VisibilityOffIcon sx={{ fontSize: 20 }} />
+                  ) : (
+                    <VisibilityIcon sx={{ fontSize: 20 }} />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Change Password Button */}
+            <div className="pt-2">
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+                onClick={handlePasswordChange}
+                disabled={isChangingPassword || !newPassword || !confirmPassword}>
+                {isChangingPassword ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <LockIcon sx={{ fontSize: 18 }} />
+                    Update Password
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Password Success Message */}
+            {passwordSuccess && <Alert message={passwordSuccess} variant="success" />}
+
+            {/* Password Error Message */}
+            {passwordError && <Alert message={passwordError} variant="error" />}
           </div>
         </div>
 

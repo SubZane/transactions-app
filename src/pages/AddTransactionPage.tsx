@@ -4,6 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Alert } from '../components/common/Alert'
 import { useAuth } from '../hooks/useAuth'
 import { Category, categoryService } from '../services/category.service'
+import { dbService } from '../services/db.service'
+import { syncService } from '../services/sync.service'
 import { transactionService } from '../services/transaction.service'
 import { MIN_TRANSACTION_AMOUNT } from '../utils/constants'
 import {
@@ -122,7 +124,24 @@ export const AddTransactionPage = () => {
           description: description.trim() || undefined,
           transaction_date: transactionDate,
         }
-        await transactionService.update(parseInt(id), data)
+
+        if (navigator.onLine) {
+          // Online - update directly
+          await transactionService.update(parseInt(id), data)
+        } else {
+          // Offline - queue for sync
+          await dbService.init()
+          const existingTransaction = await dbService.getTransaction(parseInt(id))
+          if (existingTransaction) {
+            const updatedTransaction = {
+              ...existingTransaction,
+              ...data,
+              user_id: user.id,
+            }
+            await dbService.saveTransaction(updatedTransaction)
+            await syncService.queueTransactionUpdate(parseInt(id), updatedTransaction as never)
+          }
+        }
       } else {
         // Create new transaction
         const data: CreateTransactionData = {
@@ -133,7 +152,24 @@ export const AddTransactionPage = () => {
           transaction_date: transactionDate,
           user_id: user.id,
         }
-        await transactionService.create(data)
+
+        if (navigator.onLine) {
+          // Online - create directly
+          await transactionService.create(data)
+        } else {
+          // Offline - save locally and queue for sync
+          await dbService.init()
+          const tempId = `temp-${Date.now()}`
+          const newTransaction = {
+            id: tempId,
+            ...data,
+            user_id: user.id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }
+          await dbService.saveTransaction(newTransaction)
+          await syncService.queueTransactionCreate(newTransaction as never)
+        }
       }
 
       // Navigate back to transactions page
@@ -157,7 +193,16 @@ export const AddTransactionPage = () => {
     setError(null)
 
     try {
-      await transactionService.delete(parseInt(id))
+      if (navigator.onLine) {
+        // Online - delete directly
+        await transactionService.delete(parseInt(id))
+      } else {
+        // Offline - delete locally and queue for sync
+        await dbService.init()
+        await dbService.deleteTransaction(parseInt(id))
+        await syncService.queueTransactionDelete(parseInt(id))
+      }
+
       navigate('/transactions')
     } catch (err) {
       console.error('Error deleting transaction:', err)

@@ -4,13 +4,16 @@ import * as XLSX from 'xlsx'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import CachedIcon from '@mui/icons-material/Cached'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import CloudSyncIcon from '@mui/icons-material/CloudSync'
 import DownloadIcon from '@mui/icons-material/Download'
 import EmailIcon from '@mui/icons-material/Email'
 import LogoutIcon from '@mui/icons-material/Logout'
 import SaveIcon from '@mui/icons-material/Save'
+import SyncIcon from '@mui/icons-material/Sync'
 
 import { Alert } from '../components/common/Alert'
 import { useAuth } from '../hooks/useAuth'
+import { useOffline } from '../hooks/useOffline'
 import { transactionService } from '../services/transaction.service'
 import { userService } from '../services/user.service'
 import { formatDate } from '../utils/formatters'
@@ -19,6 +22,7 @@ import type { ProfilePageProps } from '../types'
 
 export const ProfilePage = ({ user }: ProfilePageProps) => {
   const { refreshUserProfile, signOut } = useAuth()
+  const { isOnline, isSyncing, lastSync, syncQueueCount, triggerSync } = useOffline()
   const [firstname, setFirstname] = useState(user.firstname || user.user_metadata?.firstname || '')
   const [surname, setSurname] = useState(user.surname || user.user_metadata?.surname || '')
   const [isEditing, setIsEditing] = useState(false)
@@ -308,6 +312,72 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
               </>
             )}
           </button>
+        </div>
+
+        {/* Offline Sync Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <CloudSyncIcon sx={{ fontSize: 20 }} />
+            Offline Sync
+          </h3>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Connection Status</p>
+                <p
+                  className={`text-sm font-semibold ${isOnline ? 'text-emerald-600' : 'text-orange-600'}`}>
+                  {isOnline ? '🟢 Online' : '🔴 Offline'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Pending Items</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {syncQueueCount} {syncQueueCount === 1 ? 'item' : 'items'}
+                </p>
+              </div>
+            </div>
+
+            {lastSync && (
+              <div className="text-sm text-gray-600">
+                <span className="font-medium">Last synced:</span>{' '}
+                {new Date(lastSync).toLocaleString()}
+              </div>
+            )}
+
+            <p className="text-sm text-gray-600">
+              The app automatically syncs your data every 30 seconds when online. You can also
+              manually trigger a sync anytime.
+            </p>
+
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={async () => {
+                setError(null)
+                setSuccess(null)
+                try {
+                  await triggerSync()
+                  setSuccess('Sync completed successfully!')
+                  setTimeout(() => setSuccess(null), 3000)
+                } catch (err) {
+                  console.error('Sync error:', err)
+                  setError('Sync failed. Please try again.')
+                }
+              }}
+              disabled={isSyncing || !isOnline}>
+              {isSyncing ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <SyncIcon sx={{ fontSize: 18 }} />
+                  {isOnline ? 'Sync Now' : 'Offline - Cannot Sync'}
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* App Settings Card */}

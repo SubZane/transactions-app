@@ -1,6 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { Dock } from './components/common/Dock'
+import { OfflineIndicator } from './components/common/OfflineIndicator'
+import { UpdatePrompt } from './components/common/UpdatePrompt'
 import { InstallPWA } from './components/InstallPWA'
 import { LoginForm } from './components/LoginForm'
 import { ScrollToTop } from './components/ScrollToTop'
@@ -28,6 +30,8 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <OfflineIndicator />
+      <UpdatePrompt />
       <div className="min-h-screen bg-base-100 pb-24">
         <main>
           <Routes>

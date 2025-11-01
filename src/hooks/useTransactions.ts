@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import { dbService } from '../services/db.service'
 import { transactionService } from '../services/transaction.service'
 
 import type { Transaction } from '../types'
@@ -24,7 +25,35 @@ export const useTransactions = (options: UseTransactionsOptions = {}): UseTransa
     setError(null)
 
     try {
-      const data = await transactionService.getAll()
+      let data: Transaction[]
+
+      if (navigator.onLine) {
+        // Online - fetch from server
+        data = await transactionService.getAll()
+      } else {
+        // Offline - fetch from IndexedDB
+        await dbService.init()
+        const offlineData = await dbService.getAllTransactions()
+
+        // Convert offline transactions to Transaction format
+        data = offlineData.map((t) => ({
+          id: typeof t.id === 'string' ? parseInt(t.id) : t.id,
+          user_id: typeof t.user_id === 'string' ? parseInt(t.user_id) : t.user_id,
+          type: t.type,
+          amount: t.amount,
+          category_id: t.category_id,
+          transaction_date: t.transaction_date,
+          description: t.description ?? null,
+          created_at: t.created_at ?? new Date().toISOString(),
+          updated_at: t.updated_at ?? new Date().toISOString(),
+          user_firstname: 'You',
+          user_surname: '',
+          category_name: null,
+          category_icon: null,
+          category_color: null,
+        }))
+      }
+
       const transactions = Array.isArray(data) ? data : []
 
       // Filter by user ID if provided

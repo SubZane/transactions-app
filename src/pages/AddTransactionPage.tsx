@@ -278,7 +278,7 @@ export const AddTransactionPage = () => {
             </div>
 
             {/* Category and Date Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className={`grid gap-4 ${type === 'expense' ? 'grid-cols-2' : 'grid-cols-1'}`}>
               {/* Category Select - Only for Expenses */}
               {type === 'expense' && (
                 <div>
@@ -301,7 +301,7 @@ export const AddTransactionPage = () => {
               )}
 
               {/* Date Input */}
-              <div className={type === 'expense' ? '' : 'sm:col-span-2'}>
+              <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Date *</label>
                 <input
                   type="date"

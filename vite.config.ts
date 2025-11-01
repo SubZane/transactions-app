@@ -85,6 +85,9 @@ export default defineConfig({
     }),
     viteStaticCopy({
       targets: [
+        // .htaccess for Apache routing
+        { src: 'public/.htaccess', dest: '' },
+
         // Reusable backend files
         { src: 'backend/auth-helper.php', dest: 'backend' },
         { src: 'backend/cors.php', dest: 'backend' },

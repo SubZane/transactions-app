@@ -3,3 +3,6 @@ dist
 build
 coverage
 .git
+
+# TypeScript service files (ESLint handles type imports better)
+src/services/*.ts

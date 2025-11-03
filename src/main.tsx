@@ -4,12 +4,17 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import App from './App'
+import { setupGlobalErrorHandlers } from './utils/errorHandler'
+import { logger } from './utils/logger'
+
+// Setup global error handling
+setupGlobalErrorHandlers()
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((error) => {
-      console.log('Service worker registration failed:', error)
+      logger.error('Service worker registration failed', error)
     })
   })
 }

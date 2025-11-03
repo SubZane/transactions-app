@@ -4,7 +4,7 @@
  */
 
 import { categoryService } from './category.service'
-import { dbService, OfflineTransaction, SyncQueueItem, type } from './db.service'
+import { dbService, type OfflineTransaction, type SyncQueueItem, type } from './db.service'
 import { transactionService } from './transaction.service'
 
 import type { Transaction } from './transaction.service'

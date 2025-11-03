@@ -39,7 +39,7 @@ export const Dock = () => {
           <PersonIcon sx={{ fontSize: 24 }} />
         </NavLink>
 
-        <NavLink to="/profile" className={linkClasses} aria-label="Profile">
+        <NavLink to="/settings" className={linkClasses} aria-label="Settings">
           <SettingsIcon sx={{ fontSize: 24 }} />
         </NavLink>
       </div>

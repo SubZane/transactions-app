@@ -5,9 +5,12 @@
 
 import './UpdatePrompt.css'
 
+import { useEffect, useRef } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 
 export const UpdatePrompt = () => {
+  const intervalRef = useRef<number | null>(null)
+
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
@@ -15,15 +18,24 @@ export const UpdatePrompt = () => {
     onRegistered(registration: ServiceWorkerRegistration | undefined) {
       if (registration) {
         // Check for updates every 60 seconds
-        setInterval(() => {
+        intervalRef.current = setInterval(() => {
           registration.update()
-        }, 60000)
+        }, 60000) as unknown as number
       }
     },
     onRegisterError(error: Error) {
       console.error('SW registration error', error)
     },
   })
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [])
 
   const handleUpdate = () => {
     updateServiceWorker(true)

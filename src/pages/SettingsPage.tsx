@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as XLSX from 'xlsx'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
@@ -7,8 +7,10 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import CloudSyncIcon from '@mui/icons-material/CloudSync'
 import DownloadIcon from '@mui/icons-material/Download'
 import EmailIcon from '@mui/icons-material/Email'
+import InfoIcon from '@mui/icons-material/Info'
 import LockIcon from '@mui/icons-material/Lock'
 import LogoutIcon from '@mui/icons-material/Logout'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import SaveIcon from '@mui/icons-material/Save'
 import SyncIcon from '@mui/icons-material/Sync'
 import VisibilityIcon from '@mui/icons-material/Visibility'
@@ -17,21 +19,25 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { Alert } from '../components/common/Alert'
 import { useAuth } from '../hooks/useAuth'
 import { useOffline } from '../hooks/useOffline'
+import { usePWAUpdate } from '../hooks/usePWAUpdate'
 import { transactionService } from '../services/transaction.service'
 import { userService } from '../services/user.service'
 import { formatDate } from '../utils/formatters'
+import { logger } from '../utils/logger'
 
-import type { ProfilePageProps } from '../types'
+import type { SettingsPageProps } from '../types'
 
-export const ProfilePage = ({ user }: ProfilePageProps) => {
+export const SettingsPage = ({ user }: SettingsPageProps) => {
   const { refreshUserProfile, signOut, updatePassword } = useAuth()
   const { isOnline, isSyncing, lastSync, syncQueueCount, triggerSync } = useOffline()
+  const { needRefresh, checkForUpdate, forceUpdate } = usePWAUpdate()
   const [firstname, setFirstname] = useState(user.firstname || user.user_metadata?.firstname || '')
   const [surname, setSurname] = useState(user.surname || user.user_metadata?.surname || '')
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [isClearing, setIsClearing] = useState(false)
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
@@ -43,6 +49,31 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordError, setPasswordError] = useState<string | null>(null)
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null)
+
+  // Debug mode state
+  const [debugMode, setDebugMode] = useState(logger.isDebugEnabled())
+
+  // Ref to store timeout IDs for cleanup
+  const timeoutRefs = useRef<number[]>([])
+
+  // Cleanup all timeouts on unmount
+  useEffect(() => {
+    return () => {
+      timeoutRefs.current.forEach((timeoutId) => clearTimeout(timeoutId))
+      timeoutRefs.current = []
+    }
+  }, [])
+
+  // Helper function to set timeout with cleanup tracking
+  const setTrackedTimeout = (callback: () => void, delay: number) => {
+    const timeoutId = setTimeout(() => {
+      callback()
+      // Remove this timeout from tracking after it executes
+      timeoutRefs.current = timeoutRefs.current.filter((id) => id !== timeoutId)
+    }, delay) as unknown as number
+    timeoutRefs.current.push(timeoutId)
+    return timeoutId
+  }
 
   const handleClearCache = async () => {
     setIsClearing(true)
@@ -67,7 +98,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
       setSuccess('Cache cleared successfully! Reloading...')
 
       // Reload the page after a short delay
-      setTimeout(() => {
+      setTrackedTimeout(() => {
         window.location.reload()
       }, 1500)
     } catch (err) {
@@ -108,7 +139,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
       XLSX.writeFile(wb, filename)
 
       setSuccess('Transactions exported successfully!')
-      setTimeout(() => setSuccess(null), 3000)
+      setTrackedTimeout(() => setSuccess(null), 3000)
     } catch (err) {
       console.error('Error exporting transactions:', err)
       setError('Failed to export transactions. Please try again.')
@@ -140,7 +171,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
       setIsEditing(false)
 
       // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(null), 3000)
+      setTrackedTimeout(() => setSuccess(null), 3000)
     } catch (err) {
       console.error('Error saving profile:', err)
       setError('Failed to save profile. Please try again.')
@@ -188,7 +219,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
       setConfirmPassword('')
 
       // Clear success message after 3 seconds
-      setTimeout(() => setPasswordSuccess(null), 3000)
+      setTrackedTimeout(() => setPasswordSuccess(null), 3000)
     } catch (err) {
       console.error('Error updating password:', err)
       const errorMessage =
@@ -206,7 +237,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
         className="fixed top-0 left-0 right-0 bg-emerald-600 z-40 shadow-lg backdrop-blur-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-3xl">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Profile</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Settings</h1>
           <p className="text-white/80 text-sm">Manage your account information</p>
         </div>
       </div>
@@ -498,7 +529,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
                 try {
                   await triggerSync()
                   setSuccess('Sync completed successfully!')
-                  setTimeout(() => setSuccess(null), 3000)
+                  setTrackedTimeout(() => setSuccess(null), 3000)
                 } catch (err) {
                   console.error('Sync error:', err)
                   setError('Sync failed. Please try again.')
@@ -520,9 +551,131 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
           </div>
         </div>
 
+        {/* App Version Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <InfoIcon sx={{ fontSize: 20 }} />
+            App Version
+          </h3>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Current Version</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  v{import.meta.env.VITE_APP_VERSION || '1.0.1'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Build Date</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {new Date(__BUILD_DATE__).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {new Date(__BUILD_DATE__).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              </div>
+            </div>
+
+            {needRefresh && (
+              <div className="flex items-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                <span className="inline-block w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span className="text-sm font-medium text-emerald-700">
+                  Update Available - New version ready to install
+                </span>
+              </div>
+            )}
+
+            <p className="text-sm text-gray-600">
+              Check for updates to ensure you have the latest features and bug fixes. The app
+              automatically checks for updates every 60 seconds.
+            </p>
+
+            <div className="flex gap-2">
+              <button
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={async () => {
+                  setIsCheckingUpdate(true)
+                  setError(null)
+                  setSuccess(null)
+                  try {
+                    await checkForUpdate()
+                    setSuccess('Checked for updates!')
+                    setTrackedTimeout(() => setSuccess(null), 3000)
+                  } catch (err) {
+                    console.error('Check update error:', err)
+                    setError('Failed to check for updates.')
+                  } finally {
+                    setIsCheckingUpdate(false)
+                  }
+                }}
+                disabled={isCheckingUpdate}>
+                {isCheckingUpdate ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Checking...
+                  </>
+                ) : (
+                  <>
+                    <RefreshIcon sx={{ fontSize: 18 }} />
+                    Check for Update
+                  </>
+                )}
+              </button>
+
+              {needRefresh && (
+                <button
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
+                  onClick={() => {
+                    forceUpdate()
+                  }}>
+                  <DownloadIcon sx={{ fontSize: 18 }} />
+                  Update Now
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* App Settings Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">App Settings</h3>
+
+          <div className="space-y-4 mb-6">
+            {/* Debug Mode Toggle */}
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div>
+                <p className="text-sm font-medium text-gray-900 mb-1">Debug Mode</p>
+                <p className="text-xs text-gray-600">
+                  Show detailed console logs for troubleshooting
+                  {import.meta.env.DEV && ' (Always on in development)'}
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={debugMode}
+                  onChange={(e) => {
+                    const enabled = e.target.checked
+                    setDebugMode(enabled)
+                    logger.setDebugMode(enabled)
+                    setSuccess(`Debug mode ${enabled ? 'enabled' : 'disabled'}`)
+                    setTrackedTimeout(() => setSuccess(null), 2000)
+                  }}
+                  className="sr-only peer"
+                  disabled={import.meta.env.DEV}
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+              </label>
+            </div>
+          </div>
 
           <p className="text-sm text-gray-600 mb-4">
             Clear cached data and refresh the app. This will unregister the service worker and clear

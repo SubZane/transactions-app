@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { Alert } from '../components/common/Alert'
 import { useAuth } from '../hooks/useAuth'
-import { Category, categoryService } from '../services/category.service'
+import { type Category, categoryService } from '../services/category.service'
 import { dbService } from '../services/db.service'
 import { syncService } from '../services/sync.service'
 import { transactionService } from '../services/transaction.service'

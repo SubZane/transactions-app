@@ -57,7 +57,7 @@ export interface LoginFormProps {
   isLoading?: boolean
 }
 
-export interface ProfilePageProps {
+export interface SettingsPageProps {
   user: {
     id: string
     email?: string

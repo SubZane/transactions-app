@@ -1,10 +1,29 @@
-# Global Error Handling & Debug Mode
+# Error Handling & Debug System
 
 ## Overview
 
-The app includes a comprehensive error handling system with debug mode control.
+The Transactions App includes a comprehensive error handling system with debug mode control, centralized logging, and graceful error recovery mechanisms.
 
-## Features
+## Table of Contents
+
+- [Error Handling \& Debug System](#error-handling--debug-system)
+  - [Overview](#overview)
+  - [Table of Contents](#table-of-contents)
+  - [Error Handling Features](#error-handling-features)
+    - [1. Global Error Handler](#1-global-error-handler)
+    - [2. React Error Boundary](#2-react-error-boundary)
+    - [3. Logger Utility](#3-logger-utility)
+    - [4. Debug Mode](#4-debug-mode)
+  - [Usage](#usage)
+    - [Using the Logger](#using-the-logger)
+    - [Using Error Handler](#using-error-handler)
+    - [Error Severity Levels](#error-severity-levels)
+  - [Debug Mode Control](#debug-mode-control)
+  - [Best Practices](#best-practices)
+  - [Error Tracking Integration](#error-tracking-integration)
+  - [Files](#files)
+
+## Error Handling Features
 
 ### 1. Global Error Handler
 

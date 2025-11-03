@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { Alert } from '../components/common/Alert'
 import { useAuth } from '../hooks/useAuth'
 import { Category, categoryService } from '../services/category.service'
+import { dbService } from '../services/db.service'
+import { syncService } from '../services/sync.service'
 import { transactionService } from '../services/transaction.service'
+import { MIN_TRANSACTION_AMOUNT } from '../utils/constants'
+import {
+  getOtherCategoryErrorMessage,
+  isOtherCategory,
+  validateOtherCategoryDescription,
+} from '../utils/validation'
 
 import type { CreateTransactionData, UpdateTransactionData } from '../services/transaction.service'
 export const AddTransactionPage = () => {
@@ -88,16 +97,13 @@ export const AddTransactionPage = () => {
     }
 
     // Description is required when "Other" category is selected
-    if (type === 'expense' && categoryId) {
-      const selectedCategory = categories.find((cat) => cat.id === parseInt(categoryId))
-      if (selectedCategory?.name === 'Other' && !description.trim()) {
-        setError('Please add a description when using the "Other" category')
-        return
-      }
+    if (!validateOtherCategoryDescription(type, categoryId, description, categories)) {
+      setError(getOtherCategoryErrorMessage())
+      return
     }
 
-    if (parseFloat(amount) < 1) {
-      setError('Amount must be at least 1 kr')
+    if (parseFloat(amount) < MIN_TRANSACTION_AMOUNT) {
+      setError(`Amount must be at least ${MIN_TRANSACTION_AMOUNT} kr`)
       return
     }
 
@@ -118,7 +124,24 @@ export const AddTransactionPage = () => {
           description: description.trim() || undefined,
           transaction_date: transactionDate,
         }
-        await transactionService.update(parseInt(id), data)
+
+        if (navigator.onLine) {
+          // Online - update directly
+          await transactionService.update(parseInt(id), data)
+        } else {
+          // Offline - queue for sync
+          await dbService.init()
+          const existingTransaction = await dbService.getTransaction(parseInt(id))
+          if (existingTransaction) {
+            const updatedTransaction = {
+              ...existingTransaction,
+              ...data,
+              user_id: user.id,
+            }
+            await dbService.saveTransaction(updatedTransaction)
+            await syncService.queueTransactionUpdate(parseInt(id), updatedTransaction as never)
+          }
+        }
       } else {
         // Create new transaction
         const data: CreateTransactionData = {
@@ -129,7 +152,24 @@ export const AddTransactionPage = () => {
           transaction_date: transactionDate,
           user_id: user.id,
         }
-        await transactionService.create(data)
+
+        if (navigator.onLine) {
+          // Online - create directly
+          await transactionService.create(data)
+        } else {
+          // Offline - save locally and queue for sync
+          await dbService.init()
+          const tempId = `temp-${Date.now()}`
+          const newTransaction = {
+            id: tempId,
+            ...data,
+            user_id: user.id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }
+          await dbService.saveTransaction(newTransaction)
+          await syncService.queueTransactionCreate(newTransaction as never)
+        }
       }
 
       // Navigate back to transactions page
@@ -153,7 +193,16 @@ export const AddTransactionPage = () => {
     setError(null)
 
     try {
-      await transactionService.delete(parseInt(id))
+      if (navigator.onLine) {
+        // Online - delete directly
+        await transactionService.delete(parseInt(id))
+      } else {
+        // Offline - delete locally and queue for sync
+        await dbService.init()
+        await dbService.deleteTransaction(parseInt(id))
+        await syncService.queueTransactionDelete(parseInt(id))
+      }
+
       navigate('/transactions')
     } catch (err) {
       console.error('Error deleting transaction:', err)
@@ -174,8 +223,10 @@ export const AddTransactionPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Top Section with Emerald Green Background */}
-      <div className="bg-emerald-600">
+      {/* Top Section with Emerald Green Background - Fixed */}
+      <div
+        className="fixed top-0 left-0 right-0 bg-emerald-600 z-40 shadow-lg backdrop-blur-sm"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-3xl">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
             {isEditMode ? 'Edit Transaction' : 'Add Transaction'}
@@ -187,28 +238,15 @@ export const AddTransactionPage = () => {
       </div>
 
       {/* Form Section */}
-      <div className="container mx-auto px-3 sm:px-4 py-4 max-w-3xl">
+      <div
+        className="container mx-auto px-3 sm:px-4 py-4 max-w-3xl"
+        style={{
+          paddingTop: 'calc(7rem + env(safe-area-inset-top))',
+        }}>
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Error Alert */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-red-600 shrink-0 mt-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span className="text-red-800 text-sm">{error}</span>
-              </div>
-            )}
+            {error && <Alert message={error} variant="error" />}
 
             {/* Transaction Type */}
             <div>
@@ -268,6 +306,8 @@ export const AddTransactionPage = () => {
               <div className="relative">
                 <input
                   type="number"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   step="1"
                   min="1"
                   placeholder="0"
@@ -283,7 +323,7 @@ export const AddTransactionPage = () => {
             </div>
 
             {/* Category and Date Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className={`grid gap-4 ${type === 'expense' ? 'grid-cols-2' : 'grid-cols-1'}`}>
               {/* Category Select - Only for Expenses */}
               {type === 'expense' && (
                 <div>
@@ -291,7 +331,7 @@ export const AddTransactionPage = () => {
                     Category *
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm bg-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base bg-white"
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
                     required={type === 'expense'}>
@@ -306,11 +346,12 @@ export const AddTransactionPage = () => {
               )}
 
               {/* Date Input */}
-              <div className={type === 'expense' ? '' : 'sm:col-span-2'}>
+              <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Date *</label>
                 <input
                   type="date"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
+                  className="w-full max-w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base appearance-none"
+                  style={{ WebkitAppearance: 'none' }}
                   value={transactionDate}
                   onChange={(e) => setTransactionDate(e.target.value)}
                   required
@@ -324,14 +365,14 @@ export const AddTransactionPage = () => {
                 Description{' '}
                 {type === 'expense' &&
                 categoryId &&
-                categories.find((cat) => cat.id === parseInt(categoryId))?.name === 'Other' ? (
+                isOtherCategory(categories.find((cat) => cat.id === parseInt(categoryId))) ? (
                   <span className="text-red-600">*</span>
                 ) : (
                   <span className="text-gray-400 font-normal">(Optional)</span>
                 )}
               </label>
               <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none"
                 rows={2}
                 placeholder={
                   type === 'expense' &&

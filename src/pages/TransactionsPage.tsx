@@ -1,53 +1,30 @@
-import { useEffect, useState } from 'react'
-
 import { BalanceBar } from '../components/BalanceBar'
 import { FilterTabs } from '../components/FilterTabs'
+import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
 import { TransactionList } from '../components/TransactionList'
 import { UserBalanceCard } from '../components/UserBalanceCard'
-import { Transaction, transactionService } from '../services/transaction.service'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import { useTransactions } from '../hooks/useTransactions'
 
 export const TransactionsPage = () => {
-  const [allTransactions, setAllTransactions] = useState<Transaction[]>([])
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'deposit' | 'expense'>('all')
-  const [searchQuery, setSearchQuery] = useState('')
+  const {
+    transactions: allTransactions,
+    filteredTransactions,
+    isLoading,
+    error,
+    filter,
+    searchQuery,
+    setFilter,
+    setSearchQuery,
+    reload,
+  } = useTransactions()
 
-  const loadTransactions = async () => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      // Load all transactions once
-      const data = await transactionService.getAll()
-      // Ensure data is an array
-      const transactions = Array.isArray(data) ? data : []
-      setAllTransactions(transactions)
-      setFilteredTransactions(transactions)
-    } catch (err) {
-      console.error('Error loading transactions:', err)
-      setError('Failed to load transactions. Please try again.')
-      setAllTransactions([])
-      setFilteredTransactions([])
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Load transactions only once on mount
-  useEffect(() => {
-    loadTransactions()
-  }, [])
-
-  // Filter transactions locally when filter changes
-  useEffect(() => {
-    if (filter === 'all') {
-      setFilteredTransactions(allTransactions)
-    } else {
-      setFilteredTransactions(allTransactions.filter((t) => t.type === filter))
-    }
-  }, [filter, allTransactions])
+  // Pull to refresh
+  const { pullDistance, isRefreshing, shouldTrigger } = usePullToRefresh({
+    onRefresh: reload,
+    threshold: 80,
+    resistance: 2.5,
+  })
 
   const getUserStats = () => {
     if (!Array.isArray(allTransactions) || allTransactions.length === 0) {
@@ -100,9 +77,18 @@ export const TransactionsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div
+      className="min-h-screen bg-gray-50 pb-24"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      {/* Pull to Refresh Indicator */}
+      <PullToRefreshIndicator
+        pullDistance={pullDistance}
+        isRefreshing={isRefreshing}
+        shouldTrigger={shouldTrigger}
+      />
+
       {/* Top Section with Emerald Green Background */}
-      <div className="bg-emerald-600">
+      <div className="bg-emerald-600" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
           {/* User Balance Comparison - This part scrolls away */}
           <div className="mb-0">

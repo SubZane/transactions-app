@@ -1,40 +1,11 @@
 import { apiClient } from '../lib/axios'
 
+import type { Transaction, CreateTransactionData, UpdateTransactionData } from '../types'
+
 const API_TRANSACTIONS_URL = import.meta.env.VITE_API_TRANSACTIONS_URL
 
-export interface Transaction {
-  id: number
-  user_id: number
-  category_id: number
-  type: 'deposit' | 'expense'
-  amount: number
-  description: string | null
-  transaction_date: string
-  created_at: string
-  updated_at: string
-  category_name: string
-  category_icon: string
-  category_color: string
-  user_firstname: string
-  user_surname: string
-}
-
-export interface CreateTransactionData {
-  category_id: number | null
-  type: 'deposit' | 'expense'
-  amount: number
-  description?: string
-  transaction_date: string
-  user_id: string
-}
-
-export interface UpdateTransactionData {
-  category_id?: number | null
-  type?: 'deposit' | 'expense'
-  amount?: number
-  description?: string
-  transaction_date?: string
-}
+// Re-export types for backward compatibility
+export type { Transaction, CreateTransactionData, UpdateTransactionData }
 
 export const transactionService = {
   /**

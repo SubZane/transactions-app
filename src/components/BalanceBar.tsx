@@ -1,19 +1,7 @@
-interface BalanceBarProps {
-  user1Name: string
-  user2Name: string
-  user1Net: number
-  user2Net: number
-}
+import type { BalanceBarProps } from '../types'
+import { formatCurrency } from '../utils/formatters'
 
 export const BalanceBar = ({ user1Name, user2Name, user1Net, user2Net }: BalanceBarProps) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('sv-SE', {
-      style: 'currency',
-      currency: 'SEK',
-      minimumFractionDigits: 0,
-    }).format(value)
-  }
-
   const balance = Math.abs(user1Net - user2Net)
   const total = Math.abs(user1Net) + Math.abs(user2Net)
   const user1Percent = total > 0 ? (Math.abs(user1Net) / total) * 100 : 50

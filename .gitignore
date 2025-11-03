@@ -40,3 +40,10 @@ backend/database.sqlite-journal
 backend/backups/*.zip
 backend/backups/*.sqlite
 !backend/backups/.gitkeep
+
+# Data directory (production database)
+data/database.sqlite
+data/database.sqlite-journal
+data/*.db
+data/*.sqlite
+

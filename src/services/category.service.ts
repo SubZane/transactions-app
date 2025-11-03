@@ -1,32 +1,11 @@
 import { apiClient } from '../lib/axios'
 
+import type { Category, CreateCategoryData, UpdateCategoryData } from '../types'
+
 const API_CATEGORIES_URL = import.meta.env.VITE_API_CATEGORIES_URL
 
-export interface Category {
-  id: number
-  name: string
-  type: 'deposit' | 'expense'
-  description: string | null
-  icon: string | null
-  color: string | null
-  created_at: string
-  updated_at: string
-}
-
-export interface CreateCategoryData {
-  name: string
-  type: 'deposit' | 'expense'
-  description?: string
-  icon?: string
-  color?: string
-}
-
-export interface UpdateCategoryData {
-  name?: string
-  description?: string
-  icon?: string
-  color?: string
-}
+// Re-export types for backward compatibility
+export type { Category, CreateCategoryData, UpdateCategoryData }
 
 export const categoryService = {
   /**

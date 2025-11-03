@@ -10,7 +10,8 @@
  * How to run: php backend/database/migrate_add_user_id_column.php
  */
 
-$dbPath = __DIR__ . '/../database.sqlite';
+// Database configuration
+$dbPath = __DIR__ . '/../../data/database.sqlite';
 
 if (!file_exists($dbPath)) {
 	die("Error: Database not found at: $dbPath\n");

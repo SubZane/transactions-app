@@ -1,9 +1,5 @@
-interface BalanceCardProps {
-  label: string
-  amount: number
-  variant?: 'default' | 'positive' | 'negative'
-  size?: 'small' | 'medium' | 'large'
-}
+import type { BalanceCardProps } from '../types'
+import { formatCurrency } from '../utils/formatters'
 
 export const BalanceCard = ({
   label,
@@ -11,15 +7,6 @@ export const BalanceCard = ({
   variant = 'default',
   size = 'medium',
 }: BalanceCardProps) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('sv-SE', {
-      style: 'currency',
-      currency: 'SEK',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value)
-  }
-
   const getTextColor = () => {
     if (variant === 'positive') return 'text-green-200'
     if (variant === 'negative') return 'text-red-200'

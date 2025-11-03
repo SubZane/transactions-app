@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Generate PWA Icons</title>
+  </head>
+  <body>
+    <h1>PWA Icon Generator</h1>
+    <p>Click the buttons below to download the required PWA icons.</p>
+
+    <button onclick="generateIcon(192)">Download 192x192</button>
+    <button onclick="generateIcon(512)">Download 512x512</button>
+    <button onclick="generateIcon(180, 'apple-touch-icon.png')">
+      Download Apple Touch Icon (180x180)
+    </button>
+
+    <canvas id="canvas" style="display: none"></canvas>
+
+    <script>
+      function generateIcon(size, filename = `pwa-${size}x${size}.png`) {
+        const canvas = document.getElementById('canvas')
+        canvas.width = size
+        canvas.height = size
+        const ctx = canvas.getContext('2d')
+
+        // Background - emerald color
+        ctx.fillStyle = '#10b981'
+        ctx.fillRect(0, 0, size, size)
+
+        // Draw receipt icon in white
+        ctx.fillStyle = 'white'
+
+        // Scale based on canvas size
+        const scale = size / 512
+
+        // Receipt body
+        const receiptWidth = 160 * scale
+        const receiptHeight = 320 * scale
+        const receiptX = (size - receiptWidth) / 2
+        const receiptY = size * 0.2
+
+        ctx.beginPath()
+        ctx.roundRect(receiptX, receiptY, receiptWidth, receiptHeight, 10 * scale)
+        ctx.fill()
+
+        // Add some lines to represent text
+        ctx.fillStyle = '#10b981'
+        const lineWidth = receiptWidth * 0.6
+        const lineX = receiptX + (receiptWidth - lineWidth) / 2
+
+        // Three lines
+        for (let i = 0; i < 3; i++) {
+          const lineY = receiptY + 60 * scale + i * 48 * scale
+          const lineHeight = 12 * scale
+          ctx.beginPath()
+          ctx.roundRect(lineX, lineY, lineWidth * (i === 2 ? 0.7 : 1), lineHeight, 4 * scale)
+          ctx.fill()
+        }
+
+        // Download
+        canvas.toBlob(function (blob) {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = filename
+          a.click()
+          URL.revokeObjectURL(url)
+        })
+      }
+    </script>
+  </body>
+</html>

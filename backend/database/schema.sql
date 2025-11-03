@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS schema_version (
 -- Expense Categories
 INSERT OR IGNORE INTO categories (id, name, type, description, icon, color) VALUES
 (1, 'Groceries', 'expense', 'Food and household items', 'ShoppingCartIcon', 'primary'),
-(2, 'Transportation', 'expense', 'Gas, public transit, parking', 'TruckIcon', 'info'),
+(2, 'Car', 'expense', 'Gas, maintenance, parking, tolls', 'DirectionsCarIcon', 'info'),
 (3, 'Restaurants', 'expense', 'Dining out, cafes, takeout', 'BuildingStorefrontIcon', 'warning'),
 (4, 'Entertainment', 'expense', 'Movies, games, hobbies', 'MusicalNoteIcon', 'secondary'),
 (5, 'Healthcare', 'expense', 'Medical, dental, pharmacy', 'HeartIcon', 'error'),

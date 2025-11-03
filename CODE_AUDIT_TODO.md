@@ -31,133 +31,13 @@ import { dbService, type OfflineTransaction, type SyncQueueItem } from './db.ser
 
 ## ⚠️ Memory Leaks & Resource Management
 
-### 2. Missing Cleanup in UpdatePrompt Component ✅ FIXED
-
-**File:** `src/components/common/UpdatePrompt.tsx:18`  
-**Issue:** `setInterval` without cleanup in `onRegistered` callback  
-**Status:** ✅ Fixed - Added useEffect cleanup and intervalRef  
-**Date Fixed:** November 3, 2025
-
-**Previous Code:**
-
-```typescript
-onRegistered(registration: ServiceWorkerRegistration | undefined) {
-  if (registration) {
-    setInterval(() => {
-      registration.update()
-    }, 60000)
-  }
-}
-```
-
-**Fixed Code:**
-
-```typescript
-const intervalRef = useRef<number | null>(null)
-
-useEffect(() => {
-  return () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-    }
-  }
-}, [])
-
-onRegistered(registration) {
-  if (registration) {
-    intervalRef.current = setInterval(() => {
-      registration.update()
-    }, 60000) as unknown as number
-  }
-}
-```
-
-**Impact:** Memory leak - interval continues after component unmount  
-**Priority:** 🟠 HIGH
-
-### 3. Uncleaned Timeouts in ProfilePage ✅ FIXED
-
-**File:** `src/pages/ProfilePage.tsx` (lines 70, 111, 143, 191, 501)  
-**Issue:** Multiple `setTimeout` calls without cleanup  
-**Status:** ✅ Fixed - Added timeout tracking with useRef and cleanup on unmount  
-**Date Fixed:** November 3, 2025
-
-**Previous Code:**
-
-```typescript
-setTimeout(() => setSuccess(null), 3000)
-```
-
-**Fixed Code:**
-
-```typescript
-// Added ref to track timeouts
-const timeoutRefs = useRef<number[]>([])
-
-// Added cleanup on unmount
-useEffect(() => {
-  return () => {
-    timeoutRefs.current.forEach((timeoutId) => clearTimeout(timeoutId))
-    timeoutRefs.current = []
-  }
-}, [])
-
-// Helper function to track timeouts
-const setTrackedTimeout = (callback: () => void, delay: number) => {
-  const timeoutId = setTimeout(() => {
-    callback()
-    timeoutRefs.current = timeoutRefs.current.filter((id) => id !== timeoutId)
-  }, delay) as unknown as number
-  timeoutRefs.current.push(timeoutId)
-  return timeoutId
-}
-
-// Usage throughout component
-setTrackedTimeout(() => setSuccess(null), 3000)
-```
-
-**Impact:** Minor memory leak, stale state updates  
-**Priority:** 🟡 MEDIUM
-
-### 4. SyncService Missing Cleanup on Unmount ✅ ALREADY FIXED
-
-**File:** `src/hooks/useOffline.ts:33-51`  
-**Issue:** `syncService.startAutoSync()` called but never stopped  
-**Status:** ✅ Already implemented correctly  
-**Date Verified:** November 3, 2025
-
-**Current Code (Already Correct):**
-
-```typescript
-useEffect(() => {
-  const init = async () => {
-    await dbService.init()
-    syncService.startAutoSync()
-    // ...
-  }
-  init()
-
-  return () => {
-    syncService.stopAutoSync()
-  }
-}, [])
-```
-
-**Implementation Details:**
-
-- The useOffline hook already has proper cleanup in place
-- `syncService.stopAutoSync()` clears the interval timer
-- Event listeners are properly removed on unmount
-- No changes needed - this was already implemented correctly
-
-**Impact:** Background sync continues after component unmount  
-**Priority:** 🟠 HIGH
+_All items in this section have been resolved._
 
 ---
 
 ## 🧹 Code Quality Issues
 
-### 5. Excessive Console Logging in Production
+### 2. Excessive Console Logging in Production
 
 **Files:** Multiple files (20+ instances)  
 **Issue:** Console statements left in production code  
@@ -183,17 +63,17 @@ if (isDev) {
 **Impact:** Performance, security (exposing internal logic)  
 **Priority:** 🟡 MEDIUM
 
-### 6. Deprecated Tailwind Classes
+### ~~3. Deprecated Tailwind Classes~~ ✅ COMPLETED
 
-**File:** `src/components/Header.tsx:19`  
-**Issue:** `z-[1]` should be `z-1`  
-**File:** `src/components/TransactionList.tsx:200, 222`  
-**Issue:** `flex-shrink-0` should be `shrink-0`  
-**Fix:** Update to modern Tailwind syntax  
-**Impact:** Deprecated warnings, potential breaking changes in future  
-**Priority:** 🟢 LOW
+**File:** `src/components/Header.tsx:19` ✅ FIXED  
+**File:** `src/components/TransactionList.tsx:200, 222` ✅ FIXED  
+**Issue:** ~~`z-[1]` should be `z-1`~~ → Updated to `z-10`  
+**Issue:** ~~`flex-shrink-0` should be `shrink-0`~~ → Updated to `shrink-0`  
+**Fix:** ✅ Updated to modern Tailwind syntax  
+**Impact:** Eliminated deprecated warnings, future-proofed styling  
+**Priority:** ~~🟢 LOW~~ → ✅ COMPLETED
 
-### 7. Missing Error Boundaries
+### 4. Missing Error Boundaries
 
 **File:** `src/App.tsx`  
 **Issue:** No React Error Boundary to catch runtime errors  
@@ -225,7 +105,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 
 ## 🔄 Inconsistencies
 
-### 8. Inconsistent Error Handling
+### 5. Inconsistent Error Handling
 
 **Issue:** Mix of different error handling patterns across files  
 **Examples:**
@@ -252,7 +132,7 @@ export const handleError = (error: unknown, context: string) => {
 
 **Priority:** 🟡 MEDIUM
 
-### 9. Mixed Type Import Styles
+### 6. Mixed Type Import Styles
 
 **Issue:** Inconsistent use of `type` imports  
 **Examples:**
@@ -273,41 +153,32 @@ import { transactionService } from './services'
 
 ### 10. Duplicate Icon Libraries
 
-**File:** `package.json`  
-**Issue:** Using both `@heroicons/react` AND `@mui/icons-material`  
-**Current Dependencies:**
-
-```json
-"@heroicons/react": "^2.2.0",
-"@mui/icons-material": "^7.3.4",
-```
-
-**Fix:** Standardize on one icon library  
-**Impact:** Bundle size (~200KB+ unnecessary)  
-**Priority:** 🟡 MEDIUM
+_This issue has been resolved - standardized on MUI icons only._
 
 ---
 
 ## 🎯 Performance Optimization
 
-### 11. Missing Memoization in TransactionList
+### ~~7. Missing Memoization in TransactionList~~ ✅ COMPLETED
 
-**File:** `src/components/TransactionList.tsx`  
-**Issue:** Icon component created on every render  
-**Fix:** Use `useMemo` for icon mappings
+**File:** `src/components/TransactionList.tsx` ✅ FIXED  
+**Issue:** ~~Icon component created on every render~~ → Icons now memoized with `useMemo`  
+**Issue:** ~~groupTransactionsByMonth function recalculated on every render~~ → Now memoized with `useCallback`  
+**Issue:** ~~Filtering happens on every render~~ → Now memoized with `useMemo`  
+**Issue:** ~~Excessive unused icon imports~~ → Cleaned up to match actual database categories  
+**Fix:** ✅ Added comprehensive memoization and optimization:
 
-```typescript
-const iconMap = useMemo(() => ({
-  Groceries: <ShoppingCartIcon />,
-  Car: <DirectionsCarIcon />,
-  // ...
-}), [])
-```
+- Icon mappings memoized with `useMemo` and mapped to actual database categories only
+- `getCategoryIcon` function memoized with `useCallback`
+- `groupTransactionsByMonth` function memoized with `useCallback`
+- Transaction filtering memoized with `useMemo`
+- Year filtering memoized with `useMemo`
+- Removed 7+ unused icon imports, reducing bundle size
 
-**Impact:** Unnecessary re-renders  
-**Priority:** 🟡 MEDIUM
+**Impact:** Eliminated unnecessary re-renders, reduced bundle size (~1.3kB), improved performance  
+**Priority:** ~~🟡 MEDIUM~~ → ✅ COMPLETED
 
-### 12. No Code Splitting
+### 8. No Code Splitting
 
 **File:** `src/App.tsx`  
 **Issue:** All pages loaded upfront  
@@ -326,7 +197,7 @@ const AddTransactionPage = lazy(() => import('./pages/AddTransactionPage'))
 **Impact:** Initial bundle size, slower first load  
 **Priority:** 🟠 HIGH
 
-### 13. Inefficient Search in useTransactions
+### 9. Inefficient Search in useTransactions
 
 **File:** `src/hooks/useTransactions.ts`  
 **Issue:** Filtering happens on every render  
@@ -344,7 +215,7 @@ const filteredTransactions = useMemo(() => {
 
 ## 🧪 Testing & Documentation
 
-### 14. No Tests
+### 10. No Tests
 
 **Issue:** Zero test coverage  
 **Fix:** Add testing setup
@@ -355,7 +226,7 @@ npm install -D vitest @testing-library/react @testing-library/jest-dom
 
 **Priority:** 🟠 HIGH
 
-### 15. Missing JSDoc Comments
+### 11. Missing JSDoc Comments
 
 **Issue:** Many functions lack documentation  
 **Fix:** Add JSDoc comments to public APIs
@@ -375,7 +246,7 @@ async syncNow(): Promise<void>
 
 ## 🔐 Security
 
-### 16. Exposed Console Errors in Production
+### 12. Exposed Console Errors in Production
 
 **Issue:** Stack traces and internal errors visible in console  
 **Fix:** Sanitize error messages in production
@@ -391,7 +262,7 @@ const sanitizeError = (error: unknown) => {
 
 **Priority:** 🟡 MEDIUM
 
-### 17. No Input Sanitization
+### 13. No Input Sanitization
 
 **Issue:** User inputs not sanitized before storage/display  
 **Fix:** Add input validation and sanitization
@@ -408,18 +279,19 @@ const sanitizedInput = DOMPurify.sanitize(userInput)
 
 ## 📦 Dependencies
 
-### 18. Unused Dependencies (Potential)
+### ~~14. Unused Dependencies~~ ✅ COMPLETED
 
 **Check if these are actually used:**
 
-- `@emotion/react` & `@emotion/styled` - Only needed if using emotion CSS
-- `@material-tailwind/react` - Check if used alongside MUI
-- `@heroicons/react` - If standardizing on MUI icons
+- ~~`@emotion/react` & `@emotion/styled`~~ ✅ **Required by MUI** - Kept as necessary peer dependencies
+- ~~`@material-tailwind/react`~~ ✅ **REMOVED** - Was completely unused, removed 47 packages
+- `@mui/icons-material` ✅ **Used** - Standardized icon library in active use
 
-**Action:** Audit imports and remove unused packages  
-**Priority:** 🟢 LOW
+**Action:** ✅ **Completed** - Removed unused Material-Tailwind, kept required MUI dependencies  
+**Impact:** Reduced node_modules size, eliminated unused code, cleaner dependency tree  
+**Priority:** ~~🟢 LOW~~ → ✅ COMPLETED
 
-### 19. Large Dependencies
+### 15. Large Dependencies
 
 **Issue:** Some dependencies are quite large  
 **Examples:**
@@ -438,7 +310,7 @@ const sanitizedInput = DOMPurify.sanitize(userInput)
 
 ## 📝 Code Organization
 
-### 20. Missing EditTransactionPage Route
+### 16. Missing EditTransactionPage Route
 
 **File:** `src/App.tsx:40`  
 **Issue:** Route defined for `/edit/:id` but uses AddTransactionPage  
@@ -451,40 +323,34 @@ const sanitizedInput = DOMPurify.sanitize(userInput)
 **Consider:** This might be intentional (reusing component), but add comment to clarify  
 **Priority:** 🟢 LOW
 
-### 21. Inconsistent File Structure
+### ~~17. Inconsistent File Structure~~ ✅ COMPLETED
 
-**Issue:** Some components in root, some in common/  
-**Fix:** Establish clear folder structure
+**Issue:** ~~Some components in root, some in common/~~ → Organized into logical directories  
+**Fix:** ✅ Established clear folder structure and moved all components:
 
 ```
 src/components/
-├── common/      # Reusable UI components
-├── layout/      # Layout components (Header, Dock)
-└── features/    # Feature-specific components
+├── common/      # Truly reusable utilities (Alert, ErrorBoundary)
+├── layout/      # Layout and navigation (Header, Dock)
+├── features/    # Business logic components (TransactionList, Balance*, Login, etc.)
+└── ui/          # Generic UI components (ScrollToTop, InstallPWA, Offline*, etc.)
 ```
 
-**Priority:** 🟢 LOW
+**Actions Completed:**
+
+- ✅ Created organized directory structure
+- ✅ Moved 15+ components to appropriate directories
+- ✅ Updated all import paths throughout the codebase
+- ✅ Verified build passes with new structure
+
+**Impact:** Improved code organization, easier navigation, clearer component categorization  
+**Priority:** ~~🟢 LOW~~ → ✅ COMPLETED
 
 ---
 
 ## 🎨 UI/UX
 
-### 22. No Loading State for Sync
-
-**File:** `src/components/common/OfflineIndicator.tsx`  
-**Issue:** Sync button doesn't show loading state during manual sync  
-**Fix:** Add loading indicator
-
-```typescript
-<button disabled={isSyncing}>
-  {isSyncing ? <Spinner /> : <SyncIcon />}
-  {isSyncing ? 'Syncing...' : 'Sync Now'}
-</button>
-```
-
-**Priority:** 🟡 MEDIUM
-
-### 23. No Offline Fallback Images
+### 18. No Offline Fallback Images
 
 **Issue:** If using images, no fallback for offline mode  
 **Fix:** Add service worker caching for images  
@@ -494,7 +360,7 @@ src/components/
 
 ## 🔧 Configuration
 
-### 24. Hardcoded Values
+### 19. Hardcoded Values
 
 **Issue:** Magic numbers and strings throughout code  
 **Examples:**
@@ -513,7 +379,7 @@ export const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours
 
 **Priority:** 🟡 MEDIUM
 
-### 25. Missing Environment Variable Validation
+### 20. Missing Environment Variable Validation
 
 **Issue:** No validation that required env vars are present  
 **Fix:** Add env validation
@@ -542,27 +408,26 @@ requiredEnvVars.forEach((key) => {
 ### Priority Breakdown
 
 - 🔴 **CRITICAL** (1): Must fix before next deployment
-- 🟠 **HIGH** (5): Should fix soon
-- 🟡 **MEDIUM** (12): Fix in next sprint
+- 🟠 **HIGH** (4): Should fix soon
+- 🟡 **MEDIUM** (9): Fix in next sprint
 - 🟢 **LOW** (7): Nice to have
 
 ### Estimated Impact
 
 - **Performance:** ~15-20% improvement possible
-- **Bundle Size:** ~200-300KB reduction possible
+- **Bundle Size:** ~100-200KB reduction possible
 - **Code Quality:** Significant improvement
 - **Maintainability:** Major improvement
 
 ### Next Steps
 
 1. Fix critical import error
-2. Address memory leaks
-3. Add error boundary
-4. Implement code splitting
-5. Set up testing framework
-6. Clean up console statements
-7. Standardize error handling
-8. Optimize dependencies
+2. Add error boundary
+3. Implement code splitting
+4. Set up testing framework
+5. Clean up console statements
+6. Standardize error handling
+7. Optimize dependencies
 
 ---
 

@@ -98,15 +98,18 @@ export default defineConfig({
         { src: 'backend/auth-helper.php', dest: 'backend' },
         { src: 'backend/cors.php', dest: 'backend' },
         { src: 'backend/database/backup_database.php', dest: 'backend/database' },
+        { src: 'backend/database/config.php', dest: 'backend/database' },
+        { src: 'backend/database/migrate_add_user_id_column.php', dest: 'backend/database' },
 
         // API endpoints
         { src: 'backend/users.php', dest: 'backend' },
         { src: 'backend/categories.php', dest: 'backend' },
         { src: 'backend/transactions.php', dest: 'backend' },
 
-        // Database files
+        // Database files and data directory
         { src: 'backend/database.sqlite', dest: 'backend' },
         { src: 'backend/database/schema.sql', dest: 'backend/database' },
+        { src: 'data', dest: 'data' },
       ],
     }),
   ],

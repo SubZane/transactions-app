@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import CloseIcon from '@mui/icons-material/Close'
 import GetAppIcon from '@mui/icons-material/GetApp'
 
-import type { BeforeInstallPromptEvent } from '../types'
+import type { BeforeInstallPromptEvent } from '../../types'
 
 export const InstallPWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)

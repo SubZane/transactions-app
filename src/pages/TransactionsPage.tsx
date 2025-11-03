@@ -1,8 +1,8 @@
-import { BalanceBar } from '../components/BalanceBar'
-import { FilterTabs } from '../components/FilterTabs'
-import { PullToRefreshIndicator } from '../components/PullToRefreshIndicator'
-import { TransactionList } from '../components/TransactionList'
-import { UserBalanceCard } from '../components/UserBalanceCard'
+import { BalanceBar } from '../components/features/BalanceBar'
+import { FilterTabs } from '../components/features/FilterTabs'
+import { TransactionList } from '../components/features/TransactionList'
+import { UserBalanceCard } from '../components/features/UserBalanceCard'
+import { PullToRefreshIndicator } from '../components/ui/PullToRefreshIndicator'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { useTransactions } from '../hooks/useTransactions'
 

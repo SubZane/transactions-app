@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import { addEnvironmentHeaders } from '../utils/environment'
 import { supabase } from './supabase'
 
 // Create axios instance with default config
@@ -11,7 +12,7 @@ export const apiClient = axios.create({
   },
 })
 
-// Request interceptor for adding auth token
+// Request interceptor for adding auth token and environment headers
 apiClient.interceptors.request.use(
   async (config) => {
     // Get current Supabase session
@@ -22,6 +23,12 @@ apiClient.interceptors.request.use(
     if (session?.access_token) {
       config.headers.Authorization = `Bearer ${session.access_token}`
     }
+
+    // Add environment headers to help backend determine which database to use
+    const envHeaders = addEnvironmentHeaders()
+    Object.keys(envHeaders).forEach((key) => {
+      config.headers[key] = envHeaders[key]
+    })
 
     return config
   },

@@ -1,6 +1,6 @@
 import CachedIcon from '@mui/icons-material/Cached'
 
-import type { PullToRefreshIndicatorProps } from '../types'
+import type { PullToRefreshIndicatorProps } from '../../types'
 
 export const PullToRefreshIndicator = ({
   pullDistance,

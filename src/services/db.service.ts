@@ -111,11 +111,29 @@ class DBService {
   // ==================== TRANSACTIONS ====================
 
   async saveTransaction(transaction: OfflineTransaction): Promise<void> {
+    console.log('💾 saveTransaction called with:', {
+      id: transaction.id,
+      idType: typeof transaction.id,
+      idValue: JSON.stringify(transaction.id),
+      transaction
+    })
+
     const store = this.getStore('transactions', 'readwrite')
     return new Promise((resolve, reject) => {
       const request = store.put(transaction)
-      request.onsuccess = () => resolve()
-      request.onerror = () => reject(request.error)
+      request.onsuccess = () => {
+        console.log('✅ Transaction saved successfully:', transaction.id)
+        resolve()
+      }
+      request.onerror = () => {
+        console.error('❌ IndexedDB error:', {
+          error: request.error,
+          transaction,
+          id: transaction.id,
+          idType: typeof transaction.id
+        })
+        reject(request.error)
+      }
     })
   }
 

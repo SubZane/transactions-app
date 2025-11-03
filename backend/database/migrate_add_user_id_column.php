@@ -10,16 +10,19 @@
  * How to run: php backend/database/migrate_add_user_id_column.php
  */
 
-// Database configuration
-$dbPath = __DIR__ . '/../../data/database.sqlite';
+require_once __DIR__ . '/config.php';
+
+echo "Migration: Add user_id column to users table\n";
+echo "Environment: " . getEnvironment() . "\n";
+
+$dbPath = getDatabasePath();
 
 if (!file_exists($dbPath)) {
 	die("Error: Database not found at: $dbPath\n");
 }
 
 try {
-	$db = new PDO('sqlite:' . $dbPath);
-	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$db = getDatabaseConnection();
 
 	echo "Starting migration: Add user_id column...\n";
 

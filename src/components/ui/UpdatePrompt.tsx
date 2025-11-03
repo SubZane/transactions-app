@@ -60,12 +60,14 @@ export const UpdatePrompt = () => {
         <div className="update-prompt__actions">
           <button
             onClick={handleUpdate}
-            className="update-prompt__button update-prompt__button--primary">
+            className="update-prompt__button update-prompt__button--primary"
+          >
             Update Now
           </button>
           <button
             onClick={handleDismiss}
-            className="update-prompt__button update-prompt__button--secondary">
+            className="update-prompt__button update-prompt__button--secondary"
+          >
             Later
           </button>
         </div>

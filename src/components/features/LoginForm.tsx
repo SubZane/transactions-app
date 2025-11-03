@@ -5,9 +5,9 @@ import LockIcon from '@mui/icons-material/Lock'
 import LoginIcon from '@mui/icons-material/Login'
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 
-import { Alert } from './common/Alert'
+import { Alert } from '../common/Alert'
 
-import type { LoginFormProps } from '../types'
+import type { LoginFormProps } from '../../types'
 
 export const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
   const [email, setEmail] = useState('')

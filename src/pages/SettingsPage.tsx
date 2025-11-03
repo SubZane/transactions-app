@@ -235,7 +235,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
       {/* Top Section with Emerald Green Background - Fixed */}
       <div
         className="fixed top-0 left-0 right-0 bg-emerald-600 z-40 shadow-lg backdrop-blur-sm"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-3xl">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Settings</h1>
           <p className="text-white/80 text-sm">Manage your account information</p>
@@ -247,7 +248,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
         className="container mx-auto px-3 sm:px-4 py-6 max-w-3xl space-y-6"
         style={{
           paddingTop: 'calc(8rem + env(safe-area-inset-top))',
-        }}>
+        }}
+      >
         {/* Profile Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           {/* Avatar Section */}
@@ -298,7 +300,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
               {!isEditing ? (
                 <button
                   className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
-                  onClick={() => setIsEditing(true)}>
+                  onClick={() => setIsEditing(true)}
+                >
                   Edit Profile
                 </button>
               ) : (
@@ -306,7 +309,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
                   <button
                     className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleSave}
-                    disabled={isSaving}>
+                    disabled={isSaving}
+                  >
                     {isSaving ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -322,7 +326,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
                   <button
                     className="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleCancel}
-                    disabled={isSaving}>
+                    disabled={isSaving}
+                  >
                     Cancel
                   </button>
                 </>
@@ -380,13 +385,27 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
             <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
           </div>
 
-          <div className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              handlePasswordChange()
+            }}
+            className="space-y-4"
+          >
             {/* New Password */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
+              <label
+                htmlFor="new-password"
+                className="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                New Password
+              </label>
               <div className="relative">
                 <input
+                  id="new-password"
+                  name="new-password"
                   type={showNewPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -395,7 +414,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
                 <button
                   type="button"
                   onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
                   {showNewPassword ? (
                     <VisibilityOffIcon sx={{ fontSize: 20 }} />
                   ) : (
@@ -407,12 +427,18 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label
+                htmlFor="confirm-password"
+                className="block text-sm font-semibold text-gray-700 mb-2"
+              >
                 Confirm New Password
               </label>
               <div className="relative">
                 <input
+                  id="confirm-password"
+                  name="confirm-password"
                   type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -421,7 +447,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
                   {showConfirmPassword ? (
                     <VisibilityOffIcon sx={{ fontSize: 20 }} />
                   ) : (
@@ -434,9 +461,10 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
             {/* Change Password Button */}
             <div className="pt-2">
               <button
+                type="submit"
                 className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
-                onClick={handlePasswordChange}
-                disabled={isChangingPassword || !newPassword || !confirmPassword}>
+                disabled={isChangingPassword || !newPassword || !confirmPassword}
+              >
                 {isChangingPassword ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -456,7 +484,7 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
 
             {/* Password Error Message */}
             {passwordError && <Alert message={passwordError} variant="error" />}
-          </div>
+          </form>
         </div>
 
         {/* Data Export Card */}
@@ -470,7 +498,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
           <button
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleExportToExcel}
-            disabled={isExporting}>
+            disabled={isExporting}
+          >
             {isExporting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -497,7 +526,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
               <div>
                 <p className="text-xs text-gray-500 mb-1">Connection Status</p>
                 <p
-                  className={`text-sm font-semibold ${isOnline ? 'text-emerald-600' : 'text-orange-600'}`}>
+                  className={`text-sm font-semibold ${isOnline ? 'text-emerald-600' : 'text-orange-600'}`}
+                >
                   {isOnline ? '🟢 Online' : '🔴 Offline'}
                 </p>
               </div>
@@ -535,7 +565,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
                   setError('Sync failed. Please try again.')
                 }
               }}
-              disabled={isSyncing || !isOnline}>
+              disabled={isSyncing || !isOnline}
+            >
               {isSyncing ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -616,7 +647,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
                     setIsCheckingUpdate(false)
                   }
                 }}
-                disabled={isCheckingUpdate}>
+                disabled={isCheckingUpdate}
+              >
                 {isCheckingUpdate ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -635,7 +667,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
                   onClick={() => {
                     forceUpdate()
-                  }}>
+                  }}
+                >
                   <DownloadIcon sx={{ fontSize: 18 }} />
                   Update Now
                 </button>
@@ -685,7 +718,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
           <button
             className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleClearCache}
-            disabled={isClearing}>
+            disabled={isClearing}
+          >
             {isClearing ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -710,7 +744,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
 
           <button
             className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
-            onClick={signOut}>
+            onClick={signOut}
+          >
             <LogoutIcon sx={{ fontSize: 18 }} />
             Sign Out
           </button>

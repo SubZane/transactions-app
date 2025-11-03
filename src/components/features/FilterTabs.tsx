@@ -3,7 +3,7 @@ import { useState } from 'react'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import SearchIcon from '@mui/icons-material/Search'
 
-import type { FilterTabsProps } from '../types'
+import type { FilterTabsProps } from '../../types'
 
 export const FilterTabs = ({
   activeFilter,

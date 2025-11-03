@@ -1,69 +1,25 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
+import BoltIcon from '@mui/icons-material/Bolt'
 import CardTravelIcon from '@mui/icons-material/CardTravel'
 import ChildCareIcon from '@mui/icons-material/ChildCare'
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'
 import EditIcon from '@mui/icons-material/Edit'
 import FastfoodIcon from '@mui/icons-material/Fastfood'
 import HomeIcon from '@mui/icons-material/Home'
-import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import ReceiptIcon from '@mui/icons-material/Receipt'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import SchoolIcon from '@mui/icons-material/School'
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
-import TheaterComedyIcon from '@mui/icons-material/TheaterComedy'
-import TrendingUpIcon from '@mui/icons-material/TrendingUp'
-import WorkIcon from '@mui/icons-material/Work'
 
-import { formatCurrency, formatDateShort, formatMonthYear } from '../utils/formatters'
-import { Alert } from './common/Alert'
+import { formatCurrency, formatDateShort, formatMonthYear } from '../../utils/formatters'
+import { Alert } from '../common/Alert'
 
-import type { Transaction } from '../services/transaction.service'
-import type { TransactionListProps } from '../types'
-
-// Category icon mapping
-const getCategoryIcon = (categoryName: string | null, type: 'deposit' | 'expense') => {
-  if (type === 'deposit') {
-    return <AccountBalanceIcon sx={{ fontSize: 'inherit' }} />
-  }
-
-  const name = categoryName?.toLowerCase() || ''
-
-  // Match category names (with plural/singular variations)
-  if (name.includes('child')) return <ChildCareIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('grocer')) return <ShoppingCartIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('car') || name.includes('petrol') || name.includes('transport'))
-    return <DirectionsCarIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('restaurant')) return <FastfoodIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('entertainment')) return <TheaterComedyIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('health')) return <LocalHospitalIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('bill')) return <ReceiptIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('utilit')) return <HomeIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('travel') || name.includes('vacation') || name.includes('trip'))
-    return <CardTravelIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('shop')) return <ShoppingBagIcon sx={{ fontSize: 'inherit' }} />
-  if (
-    name.includes('hous') ||
-    name.includes('home') ||
-    name.includes('rent') ||
-    name.includes('renov')
-  )
-    return <HomeIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('educat') || name.includes('school'))
-    return <SchoolIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('invest')) return <TrendingUpIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('freelance') || name.includes('salary') || name.includes('work'))
-    return <WorkIcon sx={{ fontSize: 'inherit' }} />
-  if (name.includes('other')) return <MoreHorizIcon sx={{ fontSize: 'inherit' }} />
-
-  // Default for unknown categories
-  return <MoreHorizIcon sx={{ fontSize: 'inherit' }} />
-}
+import type { Transaction } from '../../services/transaction.service'
+import type { TransactionListProps } from '../../types'
 
 export const TransactionList = ({
   transactions,
@@ -77,12 +33,56 @@ export const TransactionList = ({
   const currentYear = new Date().getFullYear()
   const [displayedYears, setDisplayedYears] = useState<number[]>([currentYear])
 
+  // Memoize icon mappings based on actual database categories
+  const iconMap = useMemo(
+    () => ({
+      // Deposit
+      deposit: <AccountBalanceIcon sx={{ fontSize: 'inherit' }} />,
+
+      // Expense categories (based on actual database categories)
+      bills: <BoltIcon sx={{ fontSize: 'inherit' }} />,
+      car: <DirectionsCarIcon sx={{ fontSize: 'inherit' }} />,
+      children: <ChildCareIcon sx={{ fontSize: 'inherit' }} />,
+      groceries: <ShoppingCartIcon sx={{ fontSize: 'inherit' }} />,
+      'house renovation': <HomeIcon sx={{ fontSize: 'inherit' }} />,
+      other: <MoreHorizIcon sx={{ fontSize: 'inherit' }} />,
+      restaurant: <FastfoodIcon sx={{ fontSize: 'inherit' }} />,
+      shopping: <ShoppingBagIcon sx={{ fontSize: 'inherit' }} />,
+      travel: <CardTravelIcon sx={{ fontSize: 'inherit' }} />,
+
+      // Default fallback
+      default: <MoreHorizIcon sx={{ fontSize: 'inherit' }} />,
+    }),
+    []
+  )
+
+  // Memoized category icon function
+  const getCategoryIcon = useCallback(
+    (categoryName: string | null, type: 'deposit' | 'expense') => {
+      if (type === 'deposit') {
+        return iconMap.deposit
+      }
+
+      const name = categoryName?.toLowerCase() || ''
+
+      // Direct match for exact category names
+      if (iconMap[name as keyof typeof iconMap]) {
+        return iconMap[name as keyof typeof iconMap]
+      }
+
+      // Default for unknown categories
+      return iconMap.default
+    },
+    [iconMap]
+  )
+
   const formatAmount = (amount: number, type: 'deposit' | 'expense') => {
     const formatted = formatCurrency(amount)
     return type === 'deposit' ? `+${formatted}` : `-${formatted}`
   }
 
-  const groupTransactionsByMonth = (transactions: Transaction[]) => {
+  // Memoized grouping function to prevent recalculation on every render
+  const groupTransactionsByMonth = useCallback((transactions: Transaction[]) => {
     const grouped = new Map<string, Transaction[]>()
 
     transactions.forEach((transaction) => {
@@ -99,24 +99,28 @@ export const TransactionList = ({
       const dateB = new Date(b[1][0].transaction_date)
       return dateB.getTime() - dateA.getTime()
     })
-  }
+  }, [])
 
-  // Filter transactions by displayed years
-  const filteredByYear = transactions.filter((t) => {
-    const year = new Date(t.transaction_date).getFullYear()
-    return displayedYears.includes(year)
-  })
+  // Memoize filtered transactions to prevent recalculation on every render
+  const filteredByYear = useMemo(() => {
+    return transactions.filter((t) => {
+      const year = new Date(t.transaction_date).getFullYear()
+      return displayedYears.includes(year)
+    })
+  }, [transactions, displayedYears])
 
-  // Filter by search query (category and description)
-  const filteredTransactions = filteredByYear.filter((t) => {
-    if (!searchQuery.trim()) return true
+  // Memoize search filtering to prevent recalculation on every render
+  const filteredTransactions = useMemo(() => {
+    return filteredByYear.filter((t) => {
+      if (!searchQuery.trim()) return true
 
-    const query = searchQuery.toLowerCase()
-    const categoryMatch = t.category_name?.toLowerCase().includes(query)
-    const descriptionMatch = t.description?.toLowerCase().includes(query)
+      const query = searchQuery.toLowerCase()
+      const categoryMatch = t.category_name?.toLowerCase().includes(query)
+      const descriptionMatch = t.description?.toLowerCase().includes(query)
 
-    return categoryMatch || descriptionMatch
-  })
+      return categoryMatch || descriptionMatch
+    })
+  }, [filteredByYear, searchQuery])
 
   // Get all available years from transactions
   const availableYears = Array.from(
@@ -197,7 +201,7 @@ export const TransactionList = ({
                     <div className="flex items-start gap-3">
                       {/* Category Icon */}
                       <div
-                        className={`text-xl flex-shrink-0 ${
+                        className={`text-xl shrink-0 ${
                           transaction.type === 'deposit' ? 'text-green-600' : 'text-gray-700'
                         }`}>
                         {getCategoryIcon(transaction.category_name, transaction.type)}
@@ -219,7 +223,7 @@ export const TransactionList = ({
                       </div>
 
                       {/* Date, Amount, Edit Button Column */}
-                      <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      <div className="flex flex-col items-end gap-1 shrink-0">
                         <span className="text-xs text-gray-500">
                           {formatDateShort(transaction.transaction_date)}
                         </span>

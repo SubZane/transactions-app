@@ -40,11 +40,10 @@ function getAuthToken()
 }
 
 // 5. Database connection
-// Database connection
-$dbPath = __DIR__ . '/../data/database.sqlite';
+require_once __DIR__ . '/database/config.php';
+
 try {
-	$db = new PDO('sqlite:' . $dbPath);
-	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$db = getDatabaseConnection();
 } catch (PDOException $e) {
 	http_response_code(500);
 	echo json_encode(['error' => 'Database connection failed', 'message' => $e->getMessage()]);

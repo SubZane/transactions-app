@@ -1,12 +1,13 @@
 {
   "name": "transactions-app",
-  "version": "1.0.1",
+  "version": "1.1.5",
   "private": true,
   "type": "module",
   "description": "A React TypeScript app with Tailwind CSS, DaisyUI, Axios, and Supabase authentication",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "prebuild:server": "node scripts/version-bump.js",
     "build:server": "tsc && vite build --mode server",
     "preview": "vite preview",
     "build:preview": "npm run build && npm run preview",
@@ -28,8 +29,6 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@heroicons/react": "^2.2.0",
-    "@material-tailwind/react": "^2.1.10",
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
     "@supabase/supabase-js": "^2.76.1",

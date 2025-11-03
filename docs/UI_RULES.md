@@ -8,17 +8,17 @@ This document outlines the UI/UX rules and design standards for the Transactions
 
 All save buttons throughout the application must follow these standards:
 
-- **Icon**: Use `CircleStackIcon` from `@heroicons/react/24/solid`
+- **Icon**: Use `SaveIcon` from `@mui/icons-material`
 - **Color**: Primary color variant (`btn-primary`)
 - **Placement**: Icon appears before the button text
-- **Size**: Icon should be `h-5 w-5`
+- **Size**: Icon fontSize should be `small` or custom size
 
 **Example:**
 
 ```tsx
-import { CircleStackIcon } from '@heroicons/react/24/solid'
+import SaveIcon from '@mui/icons-material/Save'
 ;<button className="btn btn-primary" onClick={handleSave}>
-  <CircleStackIcon className="h-5 w-5" />
+  <SaveIcon fontSize="small" />
   Save Changes
 </button>
 ```
@@ -53,7 +53,7 @@ When a save operation is in progress:
 
 All icons in the application should follow the coding conventions outlined in `CODING_CONVENTIONS.md`:
 
-- Use Heroicons solid variants only
+- Use MUI Icons (Material-UI icons) only
 - Use 24px (h-6 w-6) for primary actions
 - Use 20px mini (h-5 w-5) for secondary elements and button icons
 - Use 16px micro (h-4 w-4) for inline text icons

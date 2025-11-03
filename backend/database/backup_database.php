@@ -11,10 +11,12 @@
  *   backupDatabase(); // Returns backup filename or false on error
  */
 
+require_once __DIR__ . '/config.php';
+
 function backupDatabase(): string|false
 {
-	// Database path
-	$dbPath = __DIR__ . '/../../data/database.sqlite';
+	// Get the current environment's database path
+	$dbPath = getDatabasePath();
 	$backupDir = __DIR__ . '/backups';
 
 	// Create backups directory if it doesn't exist

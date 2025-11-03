@@ -51,13 +51,13 @@ export default tseslint.config(
       // Prettier
       'prettier/prettier': 'warn',
 
-      // TypeScript - Enforce consistent type imports to prevent malformed imports
+      // TypeScript - Enforce consistent type imports (separate imports to prevent formatter issues)
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/consistent-type-imports': [
         'error',
         {
           prefer: 'type-imports',
-          fixStyle: 'inline-type-imports',
+          fixStyle: 'separate-type-imports', // Changed from 'inline-type-imports' to prevent formatter issues
         },
       ],
 

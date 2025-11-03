@@ -38,7 +38,8 @@ const defaultIcons: Record<AlertVariant, ReactNode> = {
       className="h-5 w-5 shrink-0 mt-0.5"
       fill="none"
       viewBox="0 0 24 24"
-      stroke="currentColor">
+      stroke="currentColor"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -53,7 +54,8 @@ const defaultIcons: Record<AlertVariant, ReactNode> = {
       className="h-5 w-5 shrink-0 mt-0.5"
       fill="none"
       viewBox="0 0 24 24"
-      stroke="currentColor">
+      stroke="currentColor"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -68,7 +70,8 @@ const defaultIcons: Record<AlertVariant, ReactNode> = {
       className="h-5 w-5 shrink-0 mt-0.5"
       fill="none"
       viewBox="0 0 24 24"
-      stroke="currentColor">
+      stroke="currentColor"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -83,7 +86,8 @@ const defaultIcons: Record<AlertVariant, ReactNode> = {
       className="h-5 w-5 shrink-0 mt-0.5"
       fill="none"
       viewBox="0 0 24 24"
-      stroke="currentColor">
+      stroke="currentColor"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -114,13 +118,15 @@ export const Alert = ({
         <button
           onClick={onDismiss}
           className={`${iconColor} hover:opacity-70 transition-opacity shrink-0`}
-          aria-label="Dismiss alert">
+          aria-label="Dismiss alert"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"
-            stroke="currentColor">
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

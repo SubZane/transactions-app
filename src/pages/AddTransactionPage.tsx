@@ -226,7 +226,8 @@ export const AddTransactionPage = () => {
       {/* Top Section with Emerald Green Background - Fixed */}
       <div
         className="fixed top-0 left-0 right-0 bg-emerald-600 z-40 shadow-lg backdrop-blur-sm"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-3xl">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
             {isEditMode ? 'Edit Transaction' : 'Add Transaction'}
@@ -242,7 +243,8 @@ export const AddTransactionPage = () => {
         className="container mx-auto px-3 sm:px-4 py-4 max-w-3xl"
         style={{
           paddingTop: 'calc(7rem + env(safe-area-inset-top))',
-        }}>
+        }}
+      >
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Error Alert */}
@@ -259,7 +261,8 @@ export const AddTransactionPage = () => {
                     type === 'expense'
                       ? 'border-red-500 bg-red-50'
                       : 'border-gray-200 hover:border-red-300 bg-white'
-                  }`}>
+                  }`}
+                >
                   <div className="flex items-center gap-2">
                     <input
                       type="radio"
@@ -281,7 +284,8 @@ export const AddTransactionPage = () => {
                     type === 'deposit'
                       ? 'border-green-500 bg-green-50'
                       : 'border-gray-200 hover:border-green-300 bg-white'
-                  }`}>
+                  }`}
+                >
                   <div className="flex items-center gap-2">
                     <input
                       type="radio"
@@ -334,7 +338,8 @@ export const AddTransactionPage = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base bg-white"
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    required={type === 'expense'}>
+                    required={type === 'expense'}
+                  >
                     <option value="">Select a category</option>
                     {filteredCategories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
@@ -399,13 +404,15 @@ export const AddTransactionPage = () => {
                 type="button"
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleCancel}
-                disabled={isSubmitting}>
+                disabled={isSubmitting}
+              >
                 Cancel
               </button>
               <button
                 type="submit"
                 className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isSubmitting}>
+                disabled={isSubmitting}
+              >
                 {isSubmitting
                   ? isEditMode
                     ? 'Updating...'
@@ -423,7 +430,8 @@ export const AddTransactionPage = () => {
                   type="button"
                   className="w-full px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => setShowDeleteConfirm(true)}
-                  disabled={isSubmitting}>
+                  disabled={isSubmitting}
+                >
                   Delete Transaction
                 </button>
               </div>
@@ -445,14 +453,16 @@ export const AddTransactionPage = () => {
                 type="button"
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                 onClick={() => setShowDeleteConfirm(false)}
-                disabled={isSubmitting}>
+                disabled={isSubmitting}
+              >
                 Cancel
               </button>
               <button
                 type="button"
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleDelete}
-                disabled={isSubmitting}>
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? 'Deleting...' : 'Delete'}
               </button>
             </div>

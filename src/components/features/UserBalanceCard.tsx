@@ -1,5 +1,5 @@
-import type { UserBalanceCardProps } from '../types'
-import { formatCurrency } from '../utils/formatters'
+import type { UserBalanceCardProps } from '../../types'
+import { formatCurrency } from '../../utils/formatters'
 
 export const UserBalanceCard = ({ name, netAmount, deposits, expenses }: UserBalanceCardProps) => {
   return (
@@ -8,8 +8,7 @@ export const UserBalanceCard = ({ name, netAmount, deposits, expenses }: UserBal
       <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 mb-2">
         <div className="text-center">
           <span className="text-white/70 text-[10px] block mb-0.5">Net</span>
-          <span
-            className={`text-xl font-bold block ${netAmount >= 0 ? 'text-green-200' : 'text-red-200'}`}>
+          <span className={`text-xl font-bold block text-green-200`}>
             {formatCurrency(netAmount)}
           </span>
         </div>

@@ -1,4 +1,4 @@
-import type { HeaderProps } from '../types'
+import type { HeaderProps } from '../../types'
 
 export const Header = ({ user, onLogout }: HeaderProps) => {
   return (
@@ -16,7 +16,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-200 rounded-box w-52">
+              className="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow bg-base-200 rounded-box w-52">
               <li>
                 <a className="justify-between">
                   Profile

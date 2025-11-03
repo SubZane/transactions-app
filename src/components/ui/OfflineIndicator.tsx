@@ -5,6 +5,10 @@
 
 import './OfflineIndicator.css'
 
+import PendingIcon from '@mui/icons-material/Pending'
+import SyncIcon from '@mui/icons-material/Sync'
+import WifiOffIcon from '@mui/icons-material/WifiOff'
+
 import { useOffline } from '../../hooks/useOffline'
 
 export const OfflineIndicator = () => {
@@ -34,26 +38,45 @@ export const OfflineIndicator = () => {
       <div className="offline-indicator__content">
         {!isOnline && (
           <>
-            <span className="offline-indicator__icon">📡</span>
+            <WifiOffIcon className="offline-indicator__icon" fontSize="small" />
             <span className="offline-indicator__text">Offline Mode</span>
           </>
         )}
 
         {isOnline && isSyncing && (
           <>
-            <span className="offline-indicator__icon spinning">🔄</span>
+            <SyncIcon className="offline-indicator__icon spinning" fontSize="small" />
             <span className="offline-indicator__text">Syncing...</span>
           </>
         )}
 
-        {isOnline && !isSyncing && syncQueueCount > 0 && (
+        {isOnline && syncQueueCount > 0 && (
           <>
-            <span className="offline-indicator__icon">⏳</span>
-            <span className="offline-indicator__text">
-              {syncQueueCount} item{syncQueueCount !== 1 ? 's' : ''} pending
-            </span>
-            <button onClick={triggerSync} className="offline-indicator__sync-btn" type="button">
-              Sync Now
+            {!isSyncing && (
+              <>
+                <PendingIcon className="offline-indicator__icon" fontSize="small" />
+                <span className="offline-indicator__text">
+                  {syncQueueCount} item{syncQueueCount !== 1 ? 's' : ''} pending
+                </span>
+              </>
+            )}
+            <button
+              onClick={triggerSync}
+              className="offline-indicator__sync-btn"
+              type="button"
+              disabled={isSyncing}
+            >
+              {isSyncing ? (
+                <>
+                  <SyncIcon className="spinning" fontSize="small" style={{ marginRight: '4px' }} />
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <SyncIcon fontSize="small" style={{ marginRight: '4px' }} />
+                  Sync Now
+                </>
+              )}
             </button>
           </>
         )}

@@ -1,5 +1,5 @@
-import type { BalanceBarProps } from '../types'
-import { formatCurrency } from '../utils/formatters'
+import type { BalanceBarProps } from '../../types'
+import { formatCurrency } from '../../utils/formatters'
 
 export const BalanceBar = ({ user1Name, user2Name, user1Net, user2Net }: BalanceBarProps) => {
   const balance = Math.abs(user1Net - user2Net)

@@ -12,8 +12,13 @@
  * CLI: php migrate_add_elisabeth.php
  */
 
+require_once __DIR__ . '/config.php';
+
+echo "Migration: Add Elisabeth Lee-Norman\n";
+echo "Environment: " . getEnvironment() . "\n";
+
 // Database configuration
-$dbPath = __DIR__ . '/../../data/database.sqlite';
+$dbPath = getDatabasePath();
 
 // Step 1: Check if database exists
 if (!file_exists($dbPath)) {
@@ -22,8 +27,7 @@ if (!file_exists($dbPath)) {
 
 try {
 	// Connect to SQLite database
-	$db = new PDO('sqlite:' . $dbPath);
-	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$db = getDatabaseConnection();
 
 	echo "✓ Connected to database\n";
 	echo "==================================================\n\n";

@@ -256,39 +256,41 @@ return <Dashboard user={user} />;
 
 ### 1. Icons
 
-**Always use Heroicons (Solid):**
+**Always use MUI Icons (Material-UI):**
 
-- **Use Heroicons solid version** for all icons in the app
-- Choose the appropriate size based on the element: 24px (solid), 20px (mini), or 16px (micro)
-- Provides a consistent, modern icon set optimized for mobile
-- Install: `npm install @heroicons/react`
+- **Use MUI Icons** for all icons in the app
+- Choose appropriate icons from `@mui/icons-material`
+- Provides a consistent, modern icon set with excellent React support
+- Already installed as part of `@mui/material` dependencies
 
 ```typescript
-// ✅ Good: Use 24px solid for standard buttons and elements
-import { UserIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/solid';
+// ✅ Good: Import and use MUI icons
+import PersonIcon from '@mui/icons-material/Person';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 
 <button className="btn btn-soft-primary">
-  <PlusIcon className="h-6 w-6" />
+  <AddIcon fontSize="small" />
   Add Transaction
 </button>
 
-// ✅ Good: Use 20px mini for smaller buttons
-import { TrashIcon } from '@heroicons/react/20/solid';
+// ✅ Good: Use fontSize prop for different sizes
+import DeleteIcon from '@mui/icons-material/Delete';
 
 <button className="btn btn-soft-error btn-sm">
-  <TrashIcon className="h-5 w-5" />
+  <DeleteIcon fontSize="small" />
 </button>
 
-// ✅ Good: Use 16px micro for very small UI elements
-import { CheckIcon } from '@heroicons/react/16/solid';
+// ✅ Good: Use fontSize="inherit" or custom styles for tiny elements
+import CheckIcon from '@mui/icons-material/Check';
 
 <span className="badge badge-success">
-  <CheckIcon className="h-4 w-4" />
+  <CheckIcon sx={{ fontSize: 16 }} />
   Verified
 </span>
 
-// ❌ Bad: Don't use outline versions
-import { UserIcon } from '@heroicons/react/24/outline'; // Avoid
+// ❌ Bad: Don't use outlined versions unless specifically needed for design
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline'; // Use filled icons
 ```
 
 ### 2. DaisyUI Components
@@ -297,14 +299,14 @@ import { UserIcon } from '@heroicons/react/24/outline'; // Avoid
 
 - **Use soft buttons** (`btn-soft-*`) for a modern, mobile-friendly appearance
 - Soft buttons provide better visual feedback on mobile devices
-- **All save buttons must use `CircleStackIcon` and `btn-primary` color**
+- **All save buttons must use `SaveIcon` and `btn-primary` color**
 
 ```typescript
-// ✅ Good: Save button with disc icon and primary color
-import { CircleStackIcon } from '@heroicons/react/24/solid';
+// ✅ Good: Save button with save icon and primary color
+import SaveIcon from '@mui/icons-material/Save';
 
 <button className="btn btn-primary" onClick={handleSave}>
-  <CircleStackIcon className="h-5 w-5" />
+  <SaveIcon fontSize="small" />
   Save Changes
 </button>
 

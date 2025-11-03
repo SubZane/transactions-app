@@ -21,7 +21,7 @@ This app helps couples (husband and wife) track their financial transactions in 
 - **Vite** - Build tool and dev server
 - **Tailwind CSS 4** - Utility-first CSS framework
 - **DaisyUI 5** - Component library with Emerald theme
-- **Heroicons** - Icon library (solid variants)
+- **MUI Icons** - Material-UI icon library
 - **Axios** - HTTP client for API calls
 - **Supabase** - Authentication
 - **ESLint 9** - Code linting

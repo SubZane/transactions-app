@@ -4,9 +4,10 @@
  */
 
 import { categoryService } from './category.service'
-import { dbService, type OfflineTransaction, type SyncQueueItem, type } from './db.service'
+import { dbService } from './db.service'
 import { transactionService } from './transaction.service'
 
+import type { OfflineTransaction, SyncQueueItem } from './db.service'
 import type { Transaction } from './transaction.service'
 import type { TransactionConflict } from '../types/conflict.types'
 
@@ -99,10 +100,18 @@ class SyncService {
     try {
       // Fetch transactions from server
       const transactions = await transactionService.getAll()
+      console.log('🔄 Server returned transactions:', transactions)
 
       // Save to IndexedDB
       await dbService.clearTransactions()
       for (const transaction of transactions) {
+        console.log('💾 Attempting to save transaction:', {
+          id: transaction.id,
+          idType: typeof transaction.id,
+          idValue: JSON.stringify(transaction.id),
+          transaction
+        })
+
         await dbService.saveTransaction({
           id: transaction.id,
           user_id: transaction.user_id,

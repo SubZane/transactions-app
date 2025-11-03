@@ -47,33 +47,33 @@ This document outlines the coding standards and conventions for the Transactions
 ```typescript
 // ✅ Good: Use interfaces for object types
 interface User {
-  id: string;
-  email: string;
-  name?: string;
+  id: string
+  email: string
+  name?: string
 }
 
 // ✅ Good: Use type for unions and primitives
-type Status = 'pending' | 'success' | 'error';
-type ID = string | number;
+type Status = 'pending' | 'success' | 'error'
+type ID = string | number
 
 // ❌ Avoid: Using 'any' type
-const data: any = fetchData(); // Bad
+const data: any = fetchData() // Bad
 
 // ✅ Good: Use specific types or unknown
-const data: User = fetchData();
-const data: unknown = fetchData(); // If type is truly unknown
+const data: User = fetchData()
+const data: unknown = fetchData() // If type is truly unknown
 ```
 
 ### 2. Type Inference
 
 ```typescript
 // ✅ Good: Let TypeScript infer when obvious
-const count = 5;
-const message = 'Hello';
+const count = 5
+const message = 'Hello'
 
 // ✅ Good: Explicit types for function parameters and returns
 function calculateTotal(items: Item[]): number {
-  return items.reduce((sum, item) => sum + item.price, 0);
+  return items.reduce((sum, item) => sum + item.price, 0)
 }
 ```
 
@@ -81,11 +81,11 @@ function calculateTotal(items: Item[]): number {
 
 ```typescript
 // ✅ Good: Use optional chaining and nullish coalescing
-const userName = user?.name ?? 'Guest';
+const userName = user?.name ?? 'Guest'
 
 // ✅ Good: Check for null/undefined explicitly when needed
 if (user && user.email) {
-  sendEmail(user.email);
+  sendEmail(user.email)
 }
 ```
 
@@ -93,7 +93,7 @@ if (user && user.email) {
 
 ```typescript
 // ✅ Prefer union types for simple cases
-type UserRole = 'admin' | 'user' | 'guest';
+type UserRole = 'admin' | 'user' | 'guest'
 
 // ✅ Use enums for complex cases with methods
 enum HttpStatus {
@@ -139,20 +139,20 @@ export const Button = ({
 ```typescript
 // ✅ Good: Extract complex logic into custom hooks
 function useFormState(initialValues: FormValues) {
-  const [values, setValues] = useState(initialValues);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [values, setValues] = useState(initialValues)
+  const [errors, setErrors] = useState<FormErrors>({})
 
   const handleChange = (field: string, value: any) => {
-    setValues((prev) => ({ ...prev, [field]: value }));
-  };
+    setValues((prev) => ({ ...prev, [field]: value }))
+  }
 
-  return { values, errors, handleChange };
+  return { values, errors, handleChange }
 }
 
 // ✅ Good: Use hooks at the top level
 function MyComponent() {
-  const { user } = useAuth();
-  const [count, setCount] = useState(0);
+  const { user } = useAuth()
+  const [count, setCount] = useState(0)
 
   // Component logic
 }
@@ -163,10 +163,10 @@ function MyComponent() {
 ```typescript
 // ✅ Good: Group related state
 interface FormState {
-  email: string;
-  password: string;
-  isSubmitting: boolean;
-  error: string | null;
+  email: string
+  password: string
+  isSubmitting: boolean
+  error: string | null
 }
 
 const [formState, setFormState] = useState<FormState>({
@@ -174,10 +174,10 @@ const [formState, setFormState] = useState<FormState>({
   password: '',
   isSubmitting: false,
   error: null,
-});
+})
 
 // ✅ Good: Use functional updates for state that depends on previous state
-setCount((prev) => prev + 1);
+setCount((prev) => prev + 1)
 ```
 
 ### 4. Event Handlers
@@ -185,13 +185,13 @@ setCount((prev) => prev + 1);
 ```typescript
 // ✅ Good: Type event handlers properly
 const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-  event.preventDefault();
+  event.preventDefault()
   // Handle click
-};
+}
 
 const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  setValue(event.target.value);
-};
+  setValue(event.target.value)
+}
 ```
 
 ### 5. Conditional Rendering
@@ -222,39 +222,41 @@ return <Dashboard user={user} />;
 
 ### 1. Icons
 
-**Always use Heroicons (Solid):**
+**Always use MUI Icons (Material-UI):**
 
-- **Use Heroicons solid version** for all icons in the app
-- Choose the appropriate size based on the element: 24px (solid), 20px (mini), or 16px (micro)
-- Provides a consistent, modern icon set optimized for mobile
-- Install: `npm install @heroicons/react`
+- **Use MUI Icons (@mui/icons-material)** for all icons in the app
+- Choose the appropriate size: small (16px), medium (24px), or large (32px)
+- Provides a consistent, modern icon set optimized for Material Design
+- Install: `npm install @mui/icons-material`
 
 ```typescript
-// ✅ Good: Use 24px solid for standard buttons and elements
-import { UserIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/solid';
+// ✅ Good: Default import pattern for MUI icons
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 <button className="btn btn-soft-primary">
-  <PlusIcon className="h-6 w-6" />
+  <AddCircleIcon />
   Add Transaction
 </button>
 
-// ✅ Good: Use 20px mini for smaller buttons
-import { TrashIcon } from '@heroicons/react/20/solid';
+// ✅ Good: Small size for smaller buttons
+import DeleteIcon from '@mui/icons-material/Delete';
 
 <button className="btn btn-soft-error btn-sm">
-  <TrashIcon className="h-5 w-5" />
+  <DeleteIcon fontSize="small" />
 </button>
 
-// ✅ Good: Use 16px micro for very small UI elements
-import { CheckIcon } from '@heroicons/react/16/solid';
+// ✅ Good: Large size for prominent UI elements
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 <span className="badge badge-success">
-  <CheckIcon className="h-4 w-4" />
+  <CheckCircleIcon fontSize="large" />
   Verified
 </span>
 
-// ❌ Bad: Don't use outline versions
-import { UserIcon } from '@heroicons/react/24/outline'; // Avoid
+// ✅ Good: Consistent import pattern
+import HomeIcon from '@mui/icons-material/Home';
 ```
 
 ### 2. DaisyUI Components
@@ -420,16 +422,16 @@ API_ENDPOINTS.ts
 
 ```typescript
 // ✅ Good: camelCase for variables and functions
-const userName = 'John';
-const isActive = true;
+const userName = 'John'
+const isActive = true
 
 function calculateTotal(items: Item[]): number {
-  return items.reduce((sum, item) => sum + item.price, 0);
+  return items.reduce((sum, item) => sum + item.price, 0)
 }
 
 // ✅ Good: UPPER_SNAKE_CASE for constants
-const MAX_RETRY_COUNT = 3;
-const API_BASE_URL = 'https://api.example.com';
+const MAX_RETRY_COUNT = 3
+const API_BASE_URL = 'https://api.example.com'
 ```
 
 ### 3. Components
@@ -438,18 +440,18 @@ const API_BASE_URL = 'https://api.example.com';
 // ✅ Good: PascalCase for components
 export const UserProfile = () => {
   /* ... */
-};
+}
 export const LoginForm = () => {
   /* ... */
-};
+}
 
 // ✅ Good: Descriptive component names
 export const TransactionList = () => {
   /* ... */
-};
+}
 export const TransactionListItem = () => {
   /* ... */
-};
+}
 ```
 
 ### 4. Interfaces and Types
@@ -457,16 +459,16 @@ export const TransactionListItem = () => {
 ```typescript
 // ✅ Good: PascalCase without 'I' prefix
 interface User {
-  id: string;
-  name: string;
+  id: string
+  name: string
 }
 
-type UserRole = 'admin' | 'user';
+type UserRole = 'admin' | 'user'
 
 // ✅ Good: Use descriptive names
 interface LoginCredentials {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 ```
 
@@ -478,12 +480,12 @@ interface LoginCredentials {
 // ✅ Good: Explain WHY, not WHAT
 // Calculate discount only for premium users
 if (user.isPremium) {
-  discount = calculatePremiumDiscount(total);
+  discount = calculatePremiumDiscount(total)
 }
 
 // ❌ Bad: Obvious comments
 // Set count to 0
-setCount(0);
+setCount(0)
 ```
 
 ### 2. JSDoc Comments
@@ -517,15 +519,15 @@ function calculateTotal(items: Item[], taxRate: number, discountCode?: string): 
 // ✅ Good: Handle errors explicitly
 const fetchUserData = async (userId: string) => {
   try {
-    const response = await apiClient.get(`/users/${userId}`);
-    return response.data;
+    const response = await apiClient.get(`/users/${userId}`)
+    return response.data
   } catch (error) {
     if (error instanceof Error) {
-      console.error('Failed to fetch user:', error.message);
+      console.error('Failed to fetch user:', error.message)
     }
-    throw error;
+    throw error
   }
-};
+}
 ```
 
 ### 2. Error Boundaries
@@ -627,22 +629,22 @@ describe('LoginForm', () => {
 ```typescript
 // ✅ Good: Group and order imports
 // 1. React and third-party libraries
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 // 2. Internal modules
-import { useAuth } from '@/hooks/useAuth';
-import { apiClient } from '@/lib/axios';
+import { useAuth } from '@/hooks/useAuth'
+import { apiClient } from '@/lib/axios'
 
 // 3. Components
-import { Button } from '@/components/Button';
-import { Card } from '@/components/Card';
+import { Button } from '@/components/Button'
+import { Card } from '@/components/Card'
 
 // 4. Types
-import type { User, AuthState } from '@/types/auth.types';
+import type { User, AuthState } from '@/types/auth.types'
 
 // 5. Styles
-import './styles.css';
+import './styles.css'
 ```
 
 ### 2. Exports
@@ -651,7 +653,7 @@ import './styles.css';
 // ✅ Good: Named exports for components
 export const LoginForm = () => {
   /* ... */
-};
+}
 
 // ✅ Good: Default export for pages/main component
 export default function HomePage() {

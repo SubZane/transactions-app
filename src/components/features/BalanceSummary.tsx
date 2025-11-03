@@ -1,5 +1,5 @@
-import type { BalanceSummaryProps } from '../types'
-import { formatCurrency } from '../utils/formatters'
+import type { BalanceSummaryProps } from '../../types'
+import { formatCurrency } from '../../utils/formatters'
 
 export const BalanceSummary = ({
   netBalance,
@@ -13,8 +13,7 @@ export const BalanceSummary = ({
       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
         <div className="text-center mb-3">
           <span className="text-white/70 text-xs block mb-1">Net Balance</span>
-          <span
-            className={`text-3xl font-bold block ${netBalance >= 0 ? 'text-green-200' : 'text-red-200'}`}>
+          <span className={`text-3xl font-bold block text-green-200`}>
             {formatCurrency(netBalance)}
           </span>
         </div>

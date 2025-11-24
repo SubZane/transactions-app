@@ -9,7 +9,9 @@ import { ScrollToTop } from './components/ui/ScrollToTop'
 import { UpdatePrompt } from './components/ui/UpdatePrompt'
 import { useAuth } from './hooks/useAuth'
 import { AddTransactionPage } from './pages/AddTransactionPage'
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { MyTransactionsPage } from './pages/MyTransactionsPage'
+import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { TransactionsPage } from './pages/TransactionsPage'
 
@@ -25,7 +27,16 @@ function App() {
   }
 
   if (!isAuthenticated) {
-    return <LoginForm onSubmit={signIn} />
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LoginForm onSubmit={signIn} />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    )
   }
 
   return (

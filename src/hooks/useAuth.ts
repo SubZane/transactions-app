@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 
-import { type Session } from '@supabase/supabase-js'
-
 import { supabase } from '../lib/supabase'
 import { userService } from '../services/user.service'
+
+import type { Session } from '@supabase/supabase-js'
 
 import type { AuthState, LoginCredentials, SignUpCredentials } from '../types/auth.types'
 
@@ -104,6 +104,13 @@ export const useAuth = () => {
     if (error) throw error
   }
 
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) throw error
+  }
+
   const updatePassword = async (newPassword: string) => {
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
@@ -123,6 +130,7 @@ export const useAuth = () => {
     signIn,
     signUp,
     signOut,
+    resetPassword,
     updatePassword,
     refreshUserProfile,
   }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import EmailIcon from '@mui/icons-material/Email'
 import LockIcon from '@mui/icons-material/Lock'
@@ -106,6 +107,15 @@ export const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
               )}
             </button>
           </form>
+
+          {/* Forgot Password Link */}
+          <div className="text-center mt-4">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
+              Forgot your password?
+            </Link>
+          </div>
         </div>
 
         {/* Footer */}

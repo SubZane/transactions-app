@@ -10,10 +10,10 @@ import { logger } from './utils/logger'
 // Setup global error handling
 setupGlobalErrorHandlers()
 
-// Register service worker for PWA
-if ('serviceWorker' in navigator) {
+// Register service worker for PWA (production only)
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((error) => {
+    navigator.serviceWorker.register('./sw.js').catch((error) => {
       logger.error('Service worker registration failed', error)
     })
   })

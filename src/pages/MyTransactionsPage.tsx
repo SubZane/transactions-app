@@ -31,15 +31,15 @@ export const MyTransactionsPage = () => {
     resistance: 2.5,
   })
 
-  const getTotalByType = (type: 'deposit' | 'expense') => {
+  const getTotalByType = (type: 'withdrawal' | 'expense') => {
     if (!Array.isArray(transactions)) return 0
     return transactions.filter((t) => t.type === type).reduce((total, t) => total + t.amount, 0)
   }
 
   const getNetBalance = () => {
-    const deposits = getTotalByType('deposit')
+    const withdrawals = getTotalByType('withdrawal')
     const expenses = getTotalByType('expense')
-    return deposits - expenses
+    return expenses - withdrawals
   }
 
   // Show loading while auth is loading or transactions are loading
@@ -80,7 +80,7 @@ export const MyTransactionsPage = () => {
           {/* User Balance */}
           <BalanceSummary
             netBalance={getNetBalance()}
-            totalDeposits={getTotalByType('deposit')}
+            totalDeposits={getTotalByType('withdrawal')}
             totalExpenses={getTotalByType('expense')}
             title="My Transactions"
           />

@@ -115,7 +115,7 @@ class SyncService {
         await dbService.saveTransaction({
           id: transaction.id,
           user_id: transaction.user_id,
-          type: transaction.type as 'deposit' | 'expense',
+          type: transaction.type as 'withdrawal' | 'expense',
           amount: transaction.amount,
           category_id: transaction.category_id,
           transaction_date: transaction.transaction_date,
@@ -135,7 +135,6 @@ class SyncService {
           id: category.id,
           name: category.name,
           type: category.type,
-          icon: category.icon,
         })
       }
 

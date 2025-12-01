@@ -31,11 +31,11 @@ export interface UseTransactionsReturn {
   /** Error message if any */
   error: string | null
   /** Current filter type */
-  filter: 'all' | 'deposit' | 'expense'
+  filter: 'all' | 'withdrawal' | 'expense'
   /** Search query */
   searchQuery: string
   /** Set the filter type */
-  setFilter: (filter: 'all' | 'deposit' | 'expense') => void
+  setFilter: (filter: 'all' | 'withdrawal' | 'expense') => void
   /** Set the search query */
   setSearchQuery: (query: string) => void
   /** Manually reload transactions */

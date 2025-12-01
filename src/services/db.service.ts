@@ -11,7 +11,7 @@ const DB_VERSION = 2 // Incremented for conflicts store
 export interface OfflineTransaction {
   id: number | string
   user_id: number | string
-  type: 'deposit' | 'expense'
+  type: 'withdrawal' | 'expense'
   amount: number
   category_id: number | null
   transaction_date: string

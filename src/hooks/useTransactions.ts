@@ -17,7 +17,7 @@ export const useTransactions = (options: UseTransactionsOptions = {}): UseTransa
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'deposit' | 'expense'>('all')
+  const [filter, setFilter] = useState<'all' | 'withdrawal' | 'expense'>('all')
   const [searchQuery, setSearchQuery] = useState('')
 
   const loadTransactions = async () => {

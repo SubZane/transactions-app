@@ -121,8 +121,8 @@ export const SettingsPage = ({ user }: SettingsPageProps) => {
       const excelData = transactions.map((t) => ({
         Date: formatDate(t.transaction_date),
         User: `${t.user_firstname} ${t.user_surname}`,
-        Category: t.category_name || 'Deposit',
-        Type: t.type === 'deposit' ? 'Deposit' : 'Expense',
+        Category: t.category_name || 'Withdrawal',
+        Type: t.type === 'withdrawal' ? 'Withdrawal' : 'Expense',
         Amount: t.amount,
         Description: t.description || '',
       }))

@@ -60,15 +60,15 @@ export const FilterTabs = ({
               </button>
               <button
                 onClick={() => {
-                  onFilterChange('deposit')
+                  onFilterChange('withdrawal')
                   setShowFilterMenu(false)
                 }}
                 className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                  activeFilter === 'deposit'
+                  activeFilter === 'withdrawal'
                     ? 'bg-emerald-50 text-emerald-700 font-medium'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}>
-                Deposits
+                Withdrawals
               </button>
               <button
                 onClick={() => {

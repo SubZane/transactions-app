@@ -19,7 +19,7 @@ export const BalanceSummary = ({
         </div>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2">
-            <div className="text-white/70 text-xs mb-1">Deposits</div>
+            <div className="text-white/70 text-xs mb-1">Withdrawals</div>
             <div className="text-white font-semibold">{formatCurrency(totalDeposits)}</div>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2">

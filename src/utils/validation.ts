@@ -12,7 +12,7 @@ export const isOtherCategory = (category: Category | undefined): boolean => {
  * @returns true if validation passes, false otherwise
  */
 export const validateOtherCategoryDescription = (
-  type: 'deposit' | 'expense',
+  type: 'withdrawal' | 'expense',
   categoryId: string | undefined,
   description: string,
   categories: Category[]

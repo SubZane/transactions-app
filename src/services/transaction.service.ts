@@ -25,9 +25,9 @@ export const transactionService = {
   },
 
   /**
-   * Get transactions by type (deposit or expense)
+   * Get transactions by type (withdrawal or expense)
    */
-  async getByType(type: 'deposit' | 'expense'): Promise<Transaction[]> {
+  async getByType(type: 'withdrawal' | 'expense'): Promise<Transaction[]> {
     const response = await apiClient.get(`${API_TRANSACTIONS_URL}/type/${type}`)
     return response.data
   },

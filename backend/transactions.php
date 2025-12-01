@@ -7,7 +7,7 @@
  * - GET    /api/transactions                    - List all transactions for authenticated user
  * - GET    /api/transactions/{id}               - Get transaction by ID
  * - GET    /api/transactions/user/{user_id}     - Get transactions by user_id
- * - GET    /api/transactions/type/{type}        - Get transactions by type (deposit/expense)
+ * - GET    /api/transactions/type/{type}        - Get transactions by type (withdrawal/expense)
  * - GET    /api/transactions/category/{category_id} - Get transactions by category
  * - POST   /api/transactions                    - Create new transaction
  * - PUT    /api/transactions/{id}               - Update transaction
@@ -135,7 +135,7 @@ function getAllTransactions($db)
             t.created_at,
             t.updated_at,
             c.name as category_name,
-            c.icon as category_icon,
+            
             c.color as category_color,
             u.firstname as user_firstname,
             u.surname as user_surname
@@ -181,7 +181,7 @@ function getTransactionById($db, $id)
             t.created_at,
             t.updated_at,
             c.name as category_name,
-            c.icon as category_icon,
+            
             c.color as category_color,
             u.firstname as user_firstname,
             u.surname as user_surname
@@ -241,7 +241,7 @@ function getTransactionsByUserId($db, $userId)
             t.created_at,
             t.updated_at,
             c.name as category_name,
-            c.icon as category_icon,
+            
             c.color as category_color,
             u.firstname as user_firstname,
             u.surname as user_surname
@@ -266,9 +266,9 @@ function getTransactionsByType($db, $type)
 	$type = urldecode($type);
 
 	// Validate type
-	if (!in_array($type, ['deposit', 'expense'])) {
+	if (!in_array($type, ['withdrawal', 'expense'])) {
 		http_response_code(400);
-		echo json_encode(['error' => 'Invalid type. Must be "deposit" or "expense"']);
+		echo json_encode(['error' => 'Invalid type. Must be "withdrawal" or "expense"']);
 		return;
 	}
 
@@ -297,7 +297,7 @@ function getTransactionsByType($db, $type)
             t.created_at,
             t.updated_at,
             c.name as category_name,
-            c.icon as category_icon,
+            
             c.color as category_color,
             u.firstname as user_firstname,
             u.surname as user_surname
@@ -342,7 +342,7 @@ function getTransactionsByCategory($db, $categoryId)
             t.created_at,
             t.updated_at,
             c.name as category_name,
-            c.icon as category_icon,
+            
             c.color as category_color,
             u.firstname as user_firstname,
             u.surname as user_surname
@@ -385,9 +385,9 @@ function createTransaction($db)
 	}
 
 	// Validate type
-	if (!in_array($input['type'], ['deposit', 'expense'])) {
+	if (!in_array($input['type'], ['withdrawal', 'expense'])) {
 		http_response_code(400);
-		echo json_encode(['error' => 'type must be "deposit" or "expense"']);
+		echo json_encode(['error' => 'type must be "withdrawal" or "expense"']);
 		return;
 	}
 
@@ -409,7 +409,7 @@ function createTransaction($db)
 		return;
 	}
 
-	// Category is required for expenses, optional for deposits
+	// Category is required for expenses, optional for withdrawals
 	if ($input['type'] === 'expense') {
 		if (!isset($input['category_id']) || empty($input['category_id'])) {
 			http_response_code(400);
@@ -434,8 +434,8 @@ function createTransaction($db)
 			echo json_encode(['error' => "Category type ({$category['type']}) does not match transaction type ({$input['type']})"]);
 			return;
 		}
-	} elseif ($input['type'] === 'deposit') {
-		// For deposits, category_id should be null
+	} elseif ($input['type'] === 'withdrawal') {
+		// For withdrawals, category_id should be null
 		$input['category_id'] = null;
 	}
 
@@ -466,7 +466,7 @@ function createTransaction($db)
             t.created_at,
             t.updated_at,
             c.name as category_name,
-            c.icon as category_icon,
+            
             c.color as category_color,
             u.firstname as user_firstname,
             u.surname as user_surname
@@ -521,9 +521,9 @@ function updateTransaction($db, $id)
 		return;
 	}
 
-	if (isset($input['type']) && !in_array($input['type'], ['deposit', 'expense'])) {
+	if (isset($input['type']) && !in_array($input['type'], ['withdrawal', 'expense'])) {
 		http_response_code(400);
-		echo json_encode(['error' => 'type must be "deposit" or "expense"']);
+		echo json_encode(['error' => 'type must be "withdrawal" or "expense"']);
 		return;
 	}
 
@@ -532,8 +532,8 @@ function updateTransaction($db, $id)
 
 	// If category is being changed, validate it
 	if (isset($input['category_id'])) {
-		// For deposits, category_id should be null
-		if ($newType === 'deposit') {
+		// For withdrawals, category_id should be null
+		if ($newType === 'withdrawal') {
 			$input['category_id'] = null;
 		} else if ($newType === 'expense') {
 			// For expenses, validate category exists and matches type
@@ -616,7 +616,7 @@ function updateTransaction($db, $id)
             t.created_at,
             t.updated_at,
             c.name as category_name,
-            c.icon as category_icon,
+            
             c.color as category_color,
             u.firstname as user_firstname,
             u.surname as user_surname

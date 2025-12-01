@@ -29,9 +29,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_users_user_id ON users(user_id);
 CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
-    type TEXT NOT NULL CHECK(type IN ('deposit', 'expense')),
+    type TEXT NOT NULL CHECK(type IN ('withdrawal', 'expense')),
     description TEXT,
-    icon TEXT, -- Icon name for UI (e.g., 'ShoppingCartIcon')
     color TEXT, -- Color for UI (e.g., 'primary', 'success', 'error')
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -44,13 +43,13 @@ CREATE INDEX IF NOT EXISTS idx_categories_type ON categories(type);
 -- TRANSACTIONS TABLE
 -- =============================================================================
 -- Individual transaction records (user-owned)
--- Note: category_id is nullable to allow deposits without categories
+-- Note: category_id is nullable to allow withdrawals without categories
 -- Note: amount is INTEGER (Swedish kronor, minimum 1 kr, no decimals)
 CREATE TABLE IF NOT EXISTS transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     category_id INTEGER NULL,
-    type TEXT NOT NULL CHECK(type IN ('deposit', 'expense')),
+    type TEXT NOT NULL CHECK(type IN ('withdrawal', 'expense')),
     amount INTEGER NOT NULL CHECK(amount >= 1),
     description TEXT,
     transaction_date TEXT NOT NULL, -- ISO 8601 format: YYYY-MM-DD
@@ -85,24 +84,24 @@ CREATE TABLE IF NOT EXISTS schema_version (
 -- Predefined categories for expenses and deposits
 
 -- Expense Categories
-INSERT OR IGNORE INTO categories (id, name, type, description, icon, color) VALUES
-(1, 'Groceries', 'expense', 'Food and household items', 'ShoppingCartIcon', 'primary'),
-(2, 'Car', 'expense', 'Gas, maintenance, parking, tolls', 'DirectionsCarIcon', 'info'),
-(3, 'Restaurants', 'expense', 'Dining out, cafes, takeout', 'BuildingStorefrontIcon', 'warning'),
-(4, 'Entertainment', 'expense', 'Movies, games, hobbies', 'MusicalNoteIcon', 'secondary'),
-(5, 'Healthcare', 'expense', 'Medical, dental, pharmacy', 'HeartIcon', 'error'),
-(6, 'Utilities', 'expense', 'Electric, water, internet, phone', 'BoltIcon', 'accent'),
-(7, 'Shopping', 'expense', 'Clothes, electronics, personal items', 'ShoppingBagIcon', 'primary'),
-(8, 'Housing', 'expense', 'Rent, mortgage, home maintenance', 'HomeIcon', 'neutral'),
-(9, 'Education', 'expense', 'Courses, books, tuition', 'AcademicCapIcon', 'info'),
-(10, 'Other Expenses', 'expense', 'Miscellaneous expenses', 'EllipsisHorizontalCircleIcon', 'neutral');
+INSERT OR IGNORE INTO categories (id, name, type, description, color) VALUES
+(1, 'Groceries', 'expense', 'Food and household items', 'primary'),
+(2, 'Car', 'expense', 'Gas, maintenance, parking, tolls', 'info'),
+(3, 'Restaurants', 'expense', 'Dining out, cafes, takeout', 'warning'),
+(4, 'Entertainment', 'expense', 'Movies, games, hobbies', 'secondary'),
+(5, 'Healthcare', 'expense', 'Medical, dental, pharmacy', 'error'),
+(6, 'Utilities', 'expense', 'Electric, water, internet, phone', 'accent'),
+(7, 'Shopping', 'expense', 'Clothes, electronics, personal items', 'primary'),
+(8, 'Housing', 'expense', 'Rent, mortgage, home maintenance', 'neutral'),
+(9, 'Education', 'expense', 'Courses, books, tuition', 'info'),
+(10, 'Other Expenses', 'expense', 'Miscellaneous expenses', 'neutral');
 
--- Deposit Categories
-INSERT OR IGNORE INTO categories (id, name, type, description, icon, color) VALUES
-(11, 'Salary', 'deposit', 'Monthly salary or wages', 'BanknotesIcon', 'success'),
-(12, 'Freelance', 'deposit', 'Freelance or contract work', 'BriefcaseIcon', 'success'),
-(13, 'Investment', 'deposit', 'Dividends, interest, returns', 'ChartBarIcon', 'success'),
-(14, 'Other Income', 'deposit', 'Miscellaneous income', 'PlusCircleIcon', 'success');
+-- Withdrawal Categories
+INSERT OR IGNORE INTO categories (id, name, type, description, color) VALUES
+(11, 'Salary', 'withdrawal', 'Monthly salary or wages', 'success'),
+(12, 'Freelance', 'withdrawal', 'Freelance or contract work', 'success'),
+(13, 'Investment', 'withdrawal', 'Dividends, interest, returns', 'success'),
+(14, 'Other Income', 'withdrawal', 'Miscellaneous income', 'success');
 
 -- =============================================================================
 -- INITIAL SCHEMA VERSION

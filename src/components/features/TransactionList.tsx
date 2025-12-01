@@ -14,6 +14,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 
 import { formatCurrency, formatDateShort, formatMonthYear } from '../../utils/formatters'
 import { Alert } from '../common/Alert'
@@ -36,13 +37,14 @@ export const TransactionList = ({
   // Memoize icon mappings based on actual database categories
   const iconMap = useMemo(
     () => ({
-      // Deposit
-      deposit: <AccountBalanceIcon sx={{ fontSize: 'inherit' }} />,
+      // Withdrawal
+      withdrawal: <SwapHorizIcon sx={{ fontSize: 'inherit' }} />,
 
       // Expense categories (based on actual database categories)
       bills: <BoltIcon sx={{ fontSize: 'inherit' }} />,
       car: <DirectionsCarIcon sx={{ fontSize: 'inherit' }} />,
       children: <ChildCareIcon sx={{ fontSize: 'inherit' }} />,
+      deposit: <AccountBalanceIcon sx={{ fontSize: 'inherit' }} />,
       groceries: <ShoppingCartIcon sx={{ fontSize: 'inherit' }} />,
       'house renovation': <HomeIcon sx={{ fontSize: 'inherit' }} />,
       other: <MoreHorizIcon sx={{ fontSize: 'inherit' }} />,
@@ -58,9 +60,9 @@ export const TransactionList = ({
 
   // Memoized category icon function
   const getCategoryIcon = useCallback(
-    (categoryName: string | null, type: 'deposit' | 'expense') => {
-      if (type === 'deposit') {
-        return iconMap.deposit
+    (categoryName: string | null, type: 'withdrawal' | 'expense') => {
+      if (type === 'withdrawal') {
+        return iconMap.withdrawal
       }
 
       const name = categoryName?.toLowerCase() || ''
@@ -76,9 +78,9 @@ export const TransactionList = ({
     [iconMap]
   )
 
-  const formatAmount = (amount: number, type: 'deposit' | 'expense') => {
+  const formatAmount = (amount: number, type: 'withdrawal' | 'expense') => {
     const formatted = formatCurrency(amount)
-    return type === 'deposit' ? `+${formatted}` : `-${formatted}`
+    return type === 'expense' ? `+${formatted}` : `-${formatted}`
   }
 
   // Memoized grouping function to prevent recalculation on every render
@@ -202,7 +204,7 @@ export const TransactionList = ({
                       {/* Category Icon */}
                       <div
                         className={`text-xl shrink-0 ${
-                          transaction.type === 'deposit' ? 'text-green-600' : 'text-gray-700'
+                          transaction.type === 'expense' ? 'text-green-600' : 'text-red-600'
                         }`}>
                         {getCategoryIcon(transaction.category_name, transaction.type)}
                       </div>
@@ -210,7 +212,7 @@ export const TransactionList = ({
                       {/* Category, User, Description */}
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-base text-gray-900 leading-tight">
-                          {transaction.type === 'deposit' ? 'Deposit' : transaction.category_name}
+                          {transaction.type === 'withdrawal' ? 'Withdrawal' : transaction.category_name}
                         </h3>
                         <p className="text-xs text-gray-500 mt-0.5">
                           {transaction.user_firstname} {transaction.user_surname}
@@ -230,7 +232,7 @@ export const TransactionList = ({
                         <div className="flex items-center gap-2">
                           <p
                             className={`text-lg font-bold ${
-                              transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600'
+                              transaction.type === 'expense' ? 'text-green-600' : 'text-red-600'
                             }`}>
                             {formatAmount(transaction.amount, transaction.type)}
                           </p>
@@ -289,7 +291,7 @@ export const TransactionList = ({
                         {/* Category Icon */}
                         <div
                           className={`text-2xl shrink-0 ${
-                            transaction.type === 'deposit' ? 'text-green-600' : 'text-gray-700'
+                            transaction.type === 'expense' ? 'text-green-600' : 'text-red-600'
                           }`}>
                           {getCategoryIcon(transaction.category_name, transaction.type)}
                         </div>
@@ -319,11 +321,11 @@ export const TransactionList = ({
                       <div className="col-span-2 flex items-center">
                         <span
                           className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            transaction.type === 'deposit'
+                            transaction.type === 'expense'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-red-100 text-red-800'
                           }`}>
-                          {transaction.type === 'deposit' ? 'Deposit' : 'Expense'}
+                          {transaction.type === 'withdrawal' ? 'Withdrawal' : 'Expense'}
                         </span>
                       </div>
 
@@ -331,7 +333,7 @@ export const TransactionList = ({
                       <div className="col-span-2 flex items-center justify-end">
                         <p
                           className={`text-lg font-bold ${
-                            transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600'
+                            transaction.type === 'expense' ? 'text-green-600' : 'text-red-600'
                           }`}>
                           {formatAmount(transaction.amount, transaction.type)}
                         </p>

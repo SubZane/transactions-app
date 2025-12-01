@@ -6,7 +6,7 @@
  * Endpoints:
  * - GET    /api/categories           - List all categories
  * - GET    /api/categories/{id}      - Get category by ID
- * - GET    /api/categories/type/{type} - Get categories by type (deposit/expense)
+ * - GET    /api/categories/type/{type} - Get categories by type (withdrawal/expense)
  * - POST   /api/categories           - Create new category
  * - PUT    /api/categories/{id}      - Update category
  * - DELETE /api/categories/{id}      - Delete category
@@ -99,7 +99,7 @@ try {
  */
 function getAllCategories($db)
 {
-	$stmt = $db->query("SELECT id, name, type, description, icon, color, created_at, updated_at FROM categories ORDER BY type, name");
+	$stmt = $db->query("SELECT id, name, type, description, color, created_at, updated_at FROM categories ORDER BY type, name");
 	echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
@@ -108,7 +108,7 @@ function getAllCategories($db)
  */
 function getCategoryById($db, $id)
 {
-	$stmt = $db->prepare("SELECT id, name, type, description, icon, color, created_at, updated_at FROM categories WHERE id = ?");
+	$stmt = $db->prepare("SELECT id, name, type, description, color, created_at, updated_at FROM categories WHERE id = ?");
 	$stmt->execute([$id]);
 	$category = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -122,20 +122,20 @@ function getCategoryById($db, $id)
 }
 
 /**
- * Get categories by type (deposit or expense)
+ * Get categories by type (withdrawal or expense)
  */
 function getCategoriesByType($db, $type)
 {
 	$type = urldecode($type);
 
 	// Validate type
-	if (!in_array($type, ['deposit', 'expense'])) {
+	if (!in_array($type, ['withdrawal', 'expense'])) {
 		http_response_code(400);
-		echo json_encode(['error' => 'Invalid type. Must be "deposit" or "expense"']);
+		echo json_encode(['error' => 'Invalid type. Must be "withdrawal" or "expense"']);
 		return;
 	}
 
-	$stmt = $db->prepare("SELECT id, name, type, description, icon, color, created_at, updated_at FROM categories WHERE type = ? ORDER BY name");
+	$stmt = $db->prepare("SELECT id, name, type, description, color, created_at, updated_at FROM categories WHERE type = ? ORDER BY name");
 	$stmt->execute([$type]);
 	echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
@@ -164,9 +164,9 @@ function createCategory($db)
 	}
 
 	// Validate type
-	if (!in_array($input['type'], ['deposit', 'expense'])) {
+	if (!in_array($input['type'], ['withdrawal', 'expense'])) {
 		http_response_code(400);
-		echo json_encode(['error' => 'type must be "deposit" or "expense"']);
+		echo json_encode(['error' => 'type must be "withdrawal" or "expense"']);
 		return;
 	}
 
@@ -181,19 +181,18 @@ function createCategory($db)
 
 	// Create category
 	$stmt = $db->prepare("
-        INSERT INTO categories (name, type, description, icon, color, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+        INSERT INTO categories (name, type, description, color, created_at, updated_at)
+        VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))
     ");
 	$stmt->execute([
 		trim($input['name']),
 		trim($input['type']),
 		isset($input['description']) ? trim($input['description']) : null,
-		isset($input['icon']) ? trim($input['icon']) : null,
 		isset($input['color']) ? trim($input['color']) : null,
 	]);
 
 	// Return created category
-	$stmt = $db->prepare("SELECT id, name, type, description, icon, color, created_at, updated_at FROM categories WHERE id = ?");
+	$stmt = $db->prepare("SELECT id, name, type, description, color, created_at, updated_at FROM categories WHERE id = ?");
 	$stmt->execute([$db->lastInsertId()]);
 	http_response_code(201);
 	echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
@@ -251,11 +250,6 @@ function updateCategory($db, $id)
 		$params[] = trim($input['description']);
 	}
 
-	if (isset($input['icon'])) {
-		$updates[] = 'icon = ?';
-		$params[] = trim($input['icon']);
-	}
-
 	if (isset($input['color'])) {
 		$updates[] = 'color = ?';
 		$params[] = trim($input['color']);
@@ -275,7 +269,7 @@ function updateCategory($db, $id)
 	$stmt->execute($params);
 
 	// Return updated category
-	$stmt = $db->prepare("SELECT id, name, type, description, icon, color, created_at, updated_at FROM categories WHERE id = ?");
+	$stmt = $db->prepare("SELECT id, name, type, description, color, created_at, updated_at FROM categories WHERE id = ?");
 	$stmt->execute([$id]);
 	echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
 }

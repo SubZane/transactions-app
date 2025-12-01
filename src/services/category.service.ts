@@ -25,9 +25,9 @@ export const categoryService = {
   },
 
   /**
-   * Get categories by type (deposit or expense)
+   * Get categories by type (withdrawal or expense)
    */
-  async getByType(type: 'deposit' | 'expense'): Promise<Category[]> {
+  async getByType(type: 'withdrawal' | 'expense'): Promise<Category[]> {
     const response = await apiClient.get(`${API_CATEGORIES_URL}/type/${type}`)
     return response.data
   },

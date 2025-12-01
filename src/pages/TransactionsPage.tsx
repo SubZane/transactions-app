@@ -54,12 +54,12 @@ export const TransactionsPage = () => {
       }
 
       const user = userMap.get(t.user_id)!
-      if (t.type === 'deposit') {
+      if (t.type === 'withdrawal') {
         user.deposits += t.amount
       } else {
         user.expenses += t.amount
       }
-      user.net = user.deposits - user.expenses
+      user.net = user.expenses - user.deposits
     })
 
     const users = Array.from(userMap.values())

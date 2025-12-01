@@ -3,16 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { Alert } from '../components/common/Alert'
 import { useAuth } from '../hooks/useAuth'
-import { type Category, categoryService } from '../services/category.service'
+import { Category, categoryService } from '../services/category.service'
 import { dbService } from '../services/db.service'
 import { syncService } from '../services/sync.service'
 import { transactionService } from '../services/transaction.service'
 import { MIN_TRANSACTION_AMOUNT } from '../utils/constants'
-import {
-  getOtherCategoryErrorMessage,
-  isOtherCategory,
-  validateOtherCategoryDescription,
-} from '../utils/validation'
+import { getOtherCategoryErrorMessage, isOtherCategory, validateOtherCategoryDescription } from '../utils/validation'
 
 import type { CreateTransactionData, UpdateTransactionData } from '../services/transaction.service'
 export const AddTransactionPage = () => {
@@ -21,7 +17,7 @@ export const AddTransactionPage = () => {
   const { user } = useAuth()
   const isEditMode = !!id
   const [categories, setCategories] = useState<Category[]>([])
-  const [type, setType] = useState<'deposit' | 'expense'>('expense')
+  const [type, setType] = useState<'withdrawal' | 'expense'>('expense')
   const [categoryId, setCategoryId] = useState<string>('')
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('')
@@ -233,7 +229,7 @@ export const AddTransactionPage = () => {
             {isEditMode ? 'Edit Transaction' : 'Add Transaction'}
           </h1>
           <p className="text-white/80 text-sm">
-            {isEditMode ? 'Update transaction details' : 'Record a new deposit or expense'}
+            {isEditMode ? 'Update transaction details' : 'Record a new withdrawal or expense'}
           </p>
         </div>
       </div>
@@ -269,7 +265,7 @@ export const AddTransactionPage = () => {
                       name="type"
                       value="expense"
                       checked={type === 'expense'}
-                      onChange={(e) => setType(e.target.value as 'expense' | 'deposit')}
+                      onChange={(e) => setType(e.target.value as 'expense' | 'withdrawal')}
                       className="h-4 w-4 text-red-600 focus:ring-red-500"
                     />
                     <div>
@@ -281,7 +277,7 @@ export const AddTransactionPage = () => {
 
                 <label
                   className={`cursor-pointer border-2 rounded-xl p-2 transition-all ${
-                    type === 'deposit'
+                    type === 'withdrawal'
                       ? 'border-green-500 bg-green-50'
                       : 'border-gray-200 hover:border-green-300 bg-white'
                   }`}
@@ -290,14 +286,14 @@ export const AddTransactionPage = () => {
                     <input
                       type="radio"
                       name="type"
-                      value="deposit"
-                      checked={type === 'deposit'}
-                      onChange={(e) => setType(e.target.value as 'expense' | 'deposit')}
+                      value="withdrawal"
+                      checked={type === 'withdrawal'}
+                      onChange={(e) => setType(e.target.value as 'expense' | 'withdrawal')}
                       className="h-4 w-4 text-green-600 focus:ring-green-500"
                     />
                     <div>
-                      <span className="font-medium text-gray-900 text-sm">Deposit</span>
-                      <p className="text-xs text-gray-500">Money deposited</p>
+                      <span className="font-medium text-gray-900 text-sm">Withdrawal</span>
+                      <p className="text-xs text-gray-500">Money withdrawn</p>
                     </div>
                   </div>
                 </label>

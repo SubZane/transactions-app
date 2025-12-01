@@ -31,8 +31,8 @@ export interface BalanceSummaryProps {
 }
 
 export interface FilterTabsProps {
-  activeFilter: 'all' | 'deposit' | 'expense'
-  onFilterChange: (filter: 'all' | 'deposit' | 'expense') => void
+  activeFilter: 'all' | 'withdrawal' | 'expense'
+  onFilterChange: (filter: 'all' | 'withdrawal' | 'expense') => void
   searchQuery?: string
   onSearchChange?: (query: string) => void
 }
